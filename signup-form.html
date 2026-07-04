@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課程報名 · 華圓覺苑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A24B;--brown:#3A211C;--text:#2A2622;--muted:#8a7d68;
+  --border:#E6E1D8;--bg:#F2EFEA;--white:#fff;
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.site-header{background:var(--brown);padding:18px 0;text-align:center}
+.site-header h1{font-family:'Noto Serif TC',serif;font-size:22px;color:#F2E4C8;letter-spacing:.12em}
+.site-header p{font-size:12px;color:#9c7d52;margin-top:4px;letter-spacing:.18em}
+
+/* HERO BANNER */
+.banner{background:linear-gradient(135deg,#3A211C 0%,#5C2E20 100%);padding:44px 20px;text-align:center}
+.banner-lotus{font-size:42px;margin-bottom:14px;opacity:.8}
+.banner h2{font-family:'Noto Serif TC',serif;font-size:28px;color:#F2E4C8;letter-spacing:.08em;margin-bottom:8px}
+.banner p{font-size:15px;color:#b89a6e;line-height:1.8}
+
+/* MAIN */
+main{flex:1;max-width:720px;margin:0 auto;width:100%;padding:40px 20px 60px}
+
+/* COURSE CARDS */
+.section-title{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--brown);letter-spacing:.06em;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--gold)}
+.course-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:40px}
+.course-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px 22px;cursor:pointer;transition:all .2s;position:relative}
+.course-card:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(201,162,75,.12)}
+.course-card.selected{border-color:var(--gold);border-width:2px;background:#FFFCF4}
+.course-card.full{opacity:.6;cursor:not-allowed}
+.course-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.course-name{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--brown)}
+.course-badge{font-size:11px;padding:3px 10px;border-radius:4px}
+.badge-open{color:#2f7d4f;background:#e7f3ec}
+.badge-full{color:#a8742a;background:#f6ecd9}
+.course-meta{font-size:13px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.course-desc{font-size:13.5px;color:#5a4a3a;line-height:1.7}
+.check-mark{position:absolute;top:16px;right:16px;width:22px;height:22px;border-radius:50%;background:var(--gold);color:var(--brown);display:none;align-items:center;justify-content:center;font-size:13px;font-weight:bold}
+.course-card.selected .check-mark{display:flex}
+
+/* FORM */
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px}
+.form-title{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--brown);margin-bottom:6px}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.7}
+
+.field{margin-bottom:20px}
+label.lbl{display:block;font-size:13.5px;color:#5a4a3a;margin-bottom:8px;font-weight:500}
+.required::after{content:' *';color:#c04a3a}
+input.inp,textarea.inp,select.inp{width:100%;padding:12px 15px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;background:var(--white);color:var(--text);transition:border .2s}
+input.inp:focus,textarea.inp:focus,select.inp:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,75,.08)}
+textarea.inp{resize:vertical;line-height:1.7}
+.field-hint{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* SELECTED COURSE DISPLAY */
+.selected-course-box{background:#FBF8F2;border:1px solid var(--gold);border-radius:8px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.selected-course-box .icon{width:34px;height:34px;border-radius:8px;background:#F2E4C8;color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.selected-course-name{font-family:'Noto Serif TC',serif;font-size:15px;color:var(--brown)}
+.selected-course-meta{font-size:12px;color:var(--muted)}
+
+.submit-btn{width:100%;padding:16px;background:var(--gold);color:var(--brown);border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;font-family:'Noto Serif TC',serif;letter-spacing:.06em;transition:opacity .2s}
+.submit-btn:hover{opacity:.88}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* SUCCESS */
+.success-box{text-align:center;padding:50px 20px}
+.success-icon{font-size:52px;margin-bottom:20px}
+.success-box h2{font-family:'Noto Serif TC',serif;font-size:24px;color:var(--brown);margin-bottom:10px}
+.success-box p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:6px}
+.back-link{display:inline-block;margin-top:24px;color:var(--gold);font-size:14px;text-decoration:none}
+.back-link:hover{text-decoration:underline}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid #E6E1D8;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* FOOTER */
+footer{background:var(--brown);color:#9c7d52;text-align:center;padding:20px;font-size:13px;letter-spacing:.08em}
+footer a{color:var(--gold);text-decoration:none}
+
+/* Error */
+.err-msg{font-size:13px;color:#c04a3a;margin-top:8px;display:none}
+.inp.error{border-color:#c04a3a}
+
+@media(max-width:600px){
+  .banner h2{font-size:22px}
+  .form-card{padding:22px 18px}
+  .course-meta{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>華圓覺苑</h1>
+  <p>HUAYUAN BUDDHIST CENTER</p>
+</header>
+
+<div class="banner">
+  <div class="banner-lotus">🪷</div>
+  <h2>課程報名</h2>
+  <p>選擇適合您的課程，填寫資料後送出<br>我們將於三個工作天內與您聯繫確認</p>
+</div>
+
+<main>
+  <!-- Step 1: 課程列表 -->
+  <div id="stepCourses">
+    <div class="section-title">目前開放報名的課程</div>
+    <div class="course-grid" id="courseGrid">
+      <div class="loading"><div class="spinner"></div><br>載入課程中…</div>
+    </div>
+  </div>
+
+  <!-- Step 2: 填寫資料 -->
+  <div id="stepForm" style="display:none">
+    <div class="form-card">
+      <div class="form-title">填寫報名資料</div>
+      <div class="form-sub">所有資料僅用於課程聯繫，不會對外公開。<br>帶 * 號為必填欄位。</div>
+
+      <div class="selected-course-box" id="selectedCourseBox"></div>
+
+      <div class="field">
+        <label class="lbl required">您的姓名</label>
+        <input class="inp" id="fName" type="text" placeholder="請輸入真實姓名" maxlength="20">
+        <div class="err-msg" id="errName">請填寫姓名</div>
+      </div>
+
+      <div class="field">
+        <label class="lbl required">聯絡電話</label>
+        <input class="inp" id="fPhone" type="tel" placeholder="09xx-xxxxxx">
+        <div class="err-msg" id="errPhone">請填寫聯絡電話</div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">電子信箱</label>
+        <input class="inp" id="fEmail" type="email" placeholder="your@email.com">
+        <div class="field-hint">若希望收到報名確認信，請填寫</div>
+        <div class="err-msg" id="errEmail">Email 格式不正確</div>
+      </div>
+
+      <div class="field">
+        <label class="lbl">備註說明</label>
+        <textarea class="inp" id="fNote" rows="3" placeholder="例：素食者、帶孩子同行、特殊需求…"></textarea>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()">送出報名 →</button>
+    </div>
+
+    <div style="text-align:center">
+      <a href="#" onclick="backToCourses();return false" style="color:var(--muted);font-size:14px">← 重新選擇課程</a>
+    </div>
+  </div>
+
+  <!-- Step 3: 完成 -->
+  <div id="stepDone" style="display:none">
+    <div class="success-box">
+      <div class="success-icon">🙏</div>
+      <h2>報名成功，感恩您的參與</h2>
+      <p>您已成功報名 <strong id="doneCourse"></strong></p>
+      <p>我們將於三個工作天內以電話或 Email 與您確認報名資訊</p>
+      <p style="margin-top:16px;font-size:13px;color:#a89b86">南無阿彌陀佛</p>
+      <a href="https://huayuantemple-art.github.io/HUA-YUAN-TEMPLE-/" class="back-link">← 返回華圓覺苑官網</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 華圓覺苑 · <a href="https://huayuantemple-art.github.io/HUA-YUAN-TEMPLE-/">回首頁</a>
+</footer>
+
+<script>
+// ════════════════════════════════
+//  ★ 填入你的 Supabase 資訊 ★
+// ════════════════════════════════
+const SUPABASE_URL      = 'https://cnsgjxqdyuondthmoqwf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_MIlOAMxDIBzqRvDAxeOMCA_-YU-xQtW';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let selectedCourse = null;
+
+// ── Load courses ──
+document.addEventListener('DOMContentLoaded', loadCourses);
+
+async function loadCourses(){
+  const {data, error} = await sb.from('courses')
+    .select('*')
+    .in('status', ['招生中','額滿'])
+    .order('created_at', {ascending: true});
+
+  if(error || !data){
+    document.getElementById('courseGrid').innerHTML =
+      '<div class="loading" style="color:#c04a3a">課程載入失敗，請稍後再試。</div>';
+    return;
+  }
+
+  if(!data.length){
+    document.getElementById('courseGrid').innerHTML =
+      '<div class="loading">目前沒有開放報名的課程，請關注最新公告。</div>';
+    return;
+  }
+
+  document.getElementById('courseGrid').innerHTML = data.map(c => `
+    <div class="course-card${c.status==='額滿'?' full':''}" id="cc-${c.id}"
+      onclick="${c.status==='額滿'?'return':'selectCourse('+c.id+')'}">
+      <div class="check-mark">✓</div>
+      <div class="course-card-head">
+        <div class="course-name">${h(c.name)}</div>
+        <span class="course-badge ${c.status==='招生中'?'badge-open':'badge-full'}">${h(c.status)}</span>
+      </div>
+      <div class="course-meta">
+        ${c.schedule?`<span>🕐 ${h(c.schedule)}</span>`:''}
+        ${c.level?`<span>📚 ${h(c.level)}</span>`:''}
+      </div>
+      ${c.description?`<div class="course-desc">${h(c.description)}</div>`:''}
+      ${c.status==='額滿'?'<div style="font-size:12px;color:#a8742a;margin-top:8px">此課程已額滿，如需候補請來電洽詢</div>':''}
+    </div>`).join('');
+
+  // store data for later
+  window._courses = data;
+}
+
+function selectCourse(id){
+  const c = window._courses.find(x=>x.id===id);
+  if(!c || c.status==='額滿') return;
+  selectedCourse = c;
+
+  // update card UI
+  document.querySelectorAll('.course-card').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('cc-'+id).classList.add('selected');
+
+  // show form after short delay
+  setTimeout(()=>{
+    document.getElementById('stepCourses').style.display='none';
+    document.getElementById('stepForm').style.display='block';
+
+    document.getElementById('selectedCourseBox').innerHTML=`
+      <div class="icon">✎</div>
+      <div>
+        <div class="selected-course-name">${h(c.name)}</div>
+        <div class="selected-course-meta">${c.schedule||''} ${c.level?'・'+c.level:''}</div>
+      </div>`;
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 200);
+}
+
+function backToCourses(){
+  document.getElementById('stepForm').style.display='none';
+  document.getElementById('stepCourses').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Submit ──
+async function submitForm(){
+  // validate
+  let ok = true;
+  const name  = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  const email = document.getElementById('fEmail').value.trim();
+  const note  = document.getElementById('fNote').value.trim();
+
+  // reset
+  ['fName','fPhone','fEmail'].forEach(id=>{
+    document.getElementById(id).classList.remove('error');
+  });
+  document.querySelectorAll('.err-msg').forEach(el=>el.style.display='none');
+
+  if(!name){
+    document.getElementById('fName').classList.add('error');
+    document.getElementById('errName').style.display='block';
+    ok=false;
+  }
+  if(!phone){
+    document.getElementById('fPhone').classList.add('error');
+    document.getElementById('errPhone').style.display='block';
+    ok=false;
+  }
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    document.getElementById('fEmail').classList.add('error');
+    document.getElementById('errEmail').style.display='block';
+    ok=false;
+  }
+  if(!ok) return;
+
+  // submit
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true;
+  btn.textContent='送出中…';
+
+  const {error} = await sb.from('registrations').insert({
+    course_id:   selectedCourse.id,
+    course_name: selectedCourse.name,
+    name, phone, email, note
+  });
+
+  if(error){
+    btn.disabled=false;
+    btn.textContent='送出報名 →';
+    alert('送出失敗，請稍後再試。\n'+error.message);
+    return;
+  }
+
+  // success
+  document.getElementById('stepForm').style.display='none';
+  document.getElementById('stepDone').style.display='block';
+  document.getElementById('doneCourse').textContent=selectedCourse.name;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
