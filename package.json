@@ -7,6 +7,8 @@
     "node": ">=22"
   },
   "scripts": {
+    "dev:web": "pnpm --filter @huayuan/web dev",
+    "build:web": "pnpm --filter @huayuan/web build",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",

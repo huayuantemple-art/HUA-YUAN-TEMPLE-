@@ -2,5 +2,25 @@
   "name": "@huayuan/web",
   "private": true,
   "version": "0.0.0",
-  "description": "前台(Nuxt 3 + ISR)— 於階段二任務 3.1 建立實際專案"
+  "type": "module",
+  "description": "前台(Nuxt 3 + ISR),對照舊站 index.html / signup-form.html 1:1 還原",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@huayuan/shared": "workspace:*",
+    "nuxt": "^3.17.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.8.0",
+    "vue-tsc": "^2.2.0"
+  }
 }

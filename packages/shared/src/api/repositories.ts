@@ -85,8 +85,8 @@ export function createApi(options: ApiOptions) {
     },
     courses: {
       ...courses,
-      /** 前台:招生中/額滿(同舊站公開狀態) */
-      listPublic: () => courses.list({ status: 'in.(招生中,額滿)', order: 'created_at.desc' }),
+      /** 前台:招生中/額滿,舊→新(同舊站 ascending 排序) */
+      listPublic: () => courses.list({ status: 'in.(招生中,額滿)', order: 'created_at.asc' }),
       listAll: () => courses.list({ order: 'created_at.desc' }),
     },
     videos: {
@@ -96,7 +96,8 @@ export function createApi(options: ApiOptions) {
     },
     documents: {
       ...documents,
-      listPublished: () => documents.list({ status: 'eq.已發布', order: 'created_at.desc' }),
+      /** 前台:已發布,舊→新(同舊站 ascending 排序) */
+      listPublished: () => documents.list({ status: 'eq.已發布', order: 'created_at.asc' }),
       listAll: () => documents.list({ order: 'created_at.desc' }),
     },
     about: singletonRepo<About>(http, 'about'),

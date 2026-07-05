@@ -28,5 +28,18 @@ export default tseslint.config(
       },
     },
   },
+  {
+    // TypeScript 已檢查未定義識別字(含 Nuxt auto-imports);no-undef 對 TS/Vue 檔為誤報
+    files: ['**/*.ts', '**/*.tsx', '**/*.vue'],
+    rules: { 'no-undef': 'off' },
+  },
+  {
+    // Nuxt 慣例:pages/layouts/app.vue 依路由單字命名;全形空白(U+3000)為舊站原文排版
+    files: ['apps/web/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'no-irregular-whitespace': 'off',
+    },
+  },
   prettier,
 )

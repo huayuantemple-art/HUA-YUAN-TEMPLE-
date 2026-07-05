@@ -29,25 +29,25 @@
 
 ## 3. 階段二 — 前台(apps/web,Nuxt 3 + ISR)
 
-- [ ] 3.1 建立 Nuxt 3 專案、接 `packages/shared`、設定 Tailwind
-- [ ] 3.2 原樣移植現有 `index.html` 的全域 CSS/字型/版面基底
-- [ ] 3.3 移植共用元件(footer、卡片、loading/空狀態)對照現有
-- [ ] 3.4 首頁 1:1 還原(含動態區塊)
-- [ ] 3.5 最新公告頁 1:1 還原(依狀態/時間)
-- [ ] 3.6 課程頁 1:1 還原(招生中/額滿呈現)
-- [ ] 3.7 弘法影音頁 1:1 還原
-- [ ] 3.8 佛法文檔頁 1:1 還原,PDF 連結改指 Supabase Storage
-- [ ] 3.9 關於我們頁 1:1 還原
-- [ ] 3.10 聯絡與交通頁 1:1 還原,地圖以白名單 iframe 安全渲染
-- [ ] 3.11 設定 ISR(再生策略),確認頁面為可索引 HTML 且後台更新後會刷新
+- [x] 3.1 建立 Nuxt 3 專案、接 `packages/shared`、設定 Tailwind
+- [x] 3.2 原樣移植現有 `index.html` 的全域 CSS/字型/版面基底
+- [x] 3.3 移植共用元件(footer、卡片、loading/空狀態)對照現有
+- [x] 3.4 首頁 1:1 還原(含動態區塊)
+- [x] 3.5 最新公告頁 1:1 還原(依狀態/時間)
+- [x] 3.6 課程頁 1:1 還原(招生中/額滿呈現)
+- [x] 3.7 弘法影音頁 1:1 還原
+- [x] 3.8 佛法文檔頁 1:1 還原,PDF 連結改指 Supabase Storage
+- [x] 3.9 關於我們頁 1:1 還原
+- [x] 3.10 聯絡與交通頁 1:1 還原,地圖以白名單 iframe 安全渲染
+- [x] 3.11 設定 ISR(再生策略),確認頁面為可索引 HTML 且後台更新後會刷新
 
 ## 4. 階段二 — 課程報名(apps/web 或獨立入口)
 
-- [ ] 4.1 兩步驟報名流程 1:1 還原(選課 → 表單 → 完成畫面)
-- [ ] 4.2 表單驗證 1:1 還原(姓名/電話必填、Email 格式)
-- [ ] 4.3 新增隱私權同意 checkbox(未勾選不可送出)
-- [ ] 4.4 加入防濫用(honeypot + rate limit;必要時 captcha),確保正常流程無感
-- [ ] 4.5 送出寫入 `registrations`,確認在 RLS 下匿名 `INSERT` 正常
+- [x] 4.1 兩步驟報名流程 1:1 還原(選課 → 表單 → 完成畫面)
+- [x] 4.2 表單驗證 1:1 還原(姓名/電話必填、Email 格式)
+- [x] 4.3 新增隱私權同意 checkbox(未勾選不可送出)
+- [x] 4.4 加入防濫用(honeypot + rate limit;必要時 captcha),確保正常流程無感(防護為前端層:honeypot + 成功送出頻率上限,僅計成功寫入且額度高於正常代報名;繞過瀏覽器直呼 REST 者僅受 RLS 限制只能 INSERT——server-side rate limit / captcha 遞延至後續變更,依 design.md open question 視實際流量決定)
+- [x] 4.5 送出寫入 `registrations`,確認在 RLS 下匿名 `INSERT` 正常
 
 ## 5. 階段二 — 後台(apps/admin,Vite + Vue 3 SPA)
 
