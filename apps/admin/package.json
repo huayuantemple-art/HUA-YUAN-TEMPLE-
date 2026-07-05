@@ -1,0 +1,6 @@
+{
+  "name": "@huayuan/admin",
+  "private": true,
+  "version": "0.0.0",
+  "description": "後台(Vite + Vue 3 SPA)— 於階段二任務 5.1 建立實際專案"
+}

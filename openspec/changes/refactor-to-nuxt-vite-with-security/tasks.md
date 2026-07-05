@@ -18,14 +18,14 @@
 
 ## 2. 階段二 — Monorepo 骨架與共用套件
 
-- [ ] 2.1 建立 pnpm workspace(`apps/web`、`apps/admin`、`packages/shared`、`supabase/`)與根 `pnpm-workspace.yaml`
-- [ ] 2.2 設定 TypeScript、ESLint、Prettier(根層共用設定)
-- [ ] 2.3 `packages/shared`:Supabase client 工廠(讀環境變數)
-- [ ] 2.4 `packages/shared`:以 axios 封裝的 api repository 層(集中讀寫、錯誤、loading)
-- [ ] 2.5 `packages/shared`:sanitize/逃逸模組 + 地圖網域白名單組 iframe helper
-- [ ] 2.6 `packages/shared`:所有資料表的 TypeScript 型別
-- [ ] 2.7 設定 `.env` 範本(`VITE_/NUXT_` 對應之 Supabase URL/anon key),確認金鑰不進版控
-- [ ] 2.8 為 `packages/shared` 寫 Vitest 單元測試(sanitize、api 層錯誤處理)
+- [x] 2.1 建立 pnpm workspace(`apps/web`、`apps/admin`、`packages/shared`、`supabase/`)與根 `pnpm-workspace.yaml`
+- [x] 2.2 設定 TypeScript、ESLint、Prettier(根層共用設定)
+- [x] 2.3 `packages/shared`:Supabase client 工廠(讀環境變數)
+- [x] 2.4 `packages/shared`:以 axios 封裝的 api repository 層(集中讀寫、錯誤、loading)
+- [x] 2.5 `packages/shared`:sanitize/逃逸模組 + 地圖網域白名單組 iframe helper
+- [x] 2.6 `packages/shared`:所有資料表的 TypeScript 型別
+- [x] 2.7 設定 `.env` 範本(`VITE_/NUXT_` 對應之 Supabase URL/anon key),確認金鑰不進版控
+- [x] 2.8 為 `packages/shared` 寫 Vitest 單元測試(sanitize、api 層錯誤處理)(16/16 PASS)
 
 ## 3. 階段二 — 前台(apps/web,Nuxt 3 + ISR)
 

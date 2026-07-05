@@ -1,0 +1,6 @@
+{
+  "name": "@huayuan/web",
+  "private": true,
+  "version": "0.0.0",
+  "description": "前台(Nuxt 3 + ISR)— 於階段二任務 3.1 建立實際專案"
+}

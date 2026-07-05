@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.output/
+.nuxt/
+coverage/
+pnpm-lock.yaml
+# 舊站單檔 HTML(重構完成後移除)
+index.html
+admin.html
+signup-form.html
+openspec/
+supabase/migrations/
+.claude/
+.codex/
+README.md
