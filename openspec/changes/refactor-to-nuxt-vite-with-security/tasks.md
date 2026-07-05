@@ -13,7 +13,7 @@
 - [x] 1.7 加「登入但無 `profiles` 紀錄視為無權限」的防呆
 - [x] 1.8 撰寫遷移腳本:將既有 `contact.map_embed` 由 iframe HTML 轉為網址/座標
 - [x] 1.9 於現有前端暫時改為白名單安全組成地圖 iframe(消除 XSS,兼容舊站)
-- [ ] 1.10 輪替 anon key,並更新所有前端引用;確認 `service_role` 不在任何前端/版控檔案
+- [x] 1.10 輪替 anon key,並更新所有前端引用;確認 `service_role` 不在任何前端/版控檔案(前端改用 `sb_publishable` key,legacy anon key 已於 2026-07-05 停用)
 - [x] 1.11 撰寫並執行安全驗證:以 anon key 對每張表嘗試 `INSERT/UPDATE/DELETE` 與讀 `registrations`,確認全被拒絕(`scripts/security-verify.sh`,24/24 PASS)
 
 ## 2. 階段二 — Monorepo 骨架與共用套件
