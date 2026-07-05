@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-07-05',
   devtools: { enabled: false },
 
+  modules: ['@vercel/analytics/nuxt'],
+
   css: ['~/assets/css/main.css'],
   vite: { plugins: [tailwindcss()] },
   build: { transpile: ['@huayuan/shared'] },

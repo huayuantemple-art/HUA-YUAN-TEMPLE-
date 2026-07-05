@@ -24,14 +24,30 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
         text-align: center;
       "
     >
-      <div style="display: inline-flex; align-items: center; gap: 14px; margin-bottom: 26px">
-        <span style="width: 50px; height: 1px; background: #c9a24b"></span>
-        <span style="font-size: 13px; letter-spacing: 0.4em; color: #c9a24b"
-          >莊嚴道場 · 智慧明燈</span
+      <div
+        class="hero-kicker"
+        style="display: inline-flex; align-items: center; gap: 14px; margin-bottom: 26px"
+      >
+        <span
+          class="hero-kicker-line"
+          style="width: 50px; height: 1px; background: #c9a24b"
+        ></span>
+        <span
+          class="hero-kicker-text"
+          style="font-size: 13px; letter-spacing: 0.4em; color: #c9a24b"
+          >諸佛唯一大事因緣出現於世
+          <br />
+          開佛知見 示佛知見 悟佛知見 入佛知見
+        </span
         >
-        <span style="width: 50px; height: 1px; background: #c9a24b"></span>
+
+        <span
+          class="hero-kicker-line"
+          style="width: 50px; height: 1px; background: #c9a24b"
+        ></span>
       </div>
       <h1
+        class="hero-title"
         style="
           font-family: 'Noto Serif TC', serif;
           font-weight: 500;
@@ -41,9 +57,10 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           letter-spacing: 0.08em;
         "
       >
-        慈光普照　智慧圓明
+        佛身真金色 圓光遍一尋
       </h1>
       <p
+        class="hero-verse"
         style="
           font-size: 16px;
           line-height: 2.1;
@@ -52,7 +69,9 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           margin: 0 auto 40px;
         "
       >
-        承續千年法脈，弘揚正信佛法。華圓覺苑誠摯邀您共沐法雨，於莊嚴中體會佛法的安定力量。
+        永斷眾煩惱 超度生死流 如是大導師 能調伏一切
+        <br />
+        眾生咸蒙化 故號為真濟 汝今宜速往 詣彼世尊所
       </p>
       <div class="hero-btns" style="display: flex; gap: 16px; justify-content: center">
         <button class="btn-gold" @click="navigateTo('/course')">立即報名課程</button>
@@ -124,12 +143,12 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
       </div>
     </div>
 
-    <!-- 弘法影音 -->
+    <!-- 法師說法 -->
     <div class="sec">
       <div class="sec-head">
         <div>
           <div class="sec-en">VIDEO TEACHING</div>
-          <div class="sec-title">弘法影音</div>
+          <div class="sec-title">法師說法</div>
         </div>
         <NuxtLink class="more-link" to="/video">更多影片 →</NuxtLink>
       </div>

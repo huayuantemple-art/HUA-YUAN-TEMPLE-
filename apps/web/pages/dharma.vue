@@ -1,6 +1,7 @@
 <template>
   <div>
     <div
+      class="sutra-page-hero"
       style="
         padding: 60px 56px 50px;
         background: linear-gradient(180deg, #4a2a22, #3a211c);
@@ -42,7 +43,7 @@
         <a href="#d-sanxue">三學</a>
       </div>
     </div>
-    <div style="max-width: 860px; margin: 0 auto; padding: 60px 40px 80px">
+    <div class="sutra-content-wrap" style="max-width: 860px; margin: 0 auto; padding: 60px 40px 80px">
       <div id="d-intro" class="sutra-quote">
         <div
           style="
@@ -103,7 +104,7 @@
           </p>
           <div class="sutra-divider"></div>
           <div class="sutra-subtitle">二、稱「寶」六義</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px">
+          <div class="sutra-inline-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px">
             <div
               style="
                 padding: 10px 14px;

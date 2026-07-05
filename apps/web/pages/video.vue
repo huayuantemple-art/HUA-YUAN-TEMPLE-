@@ -8,8 +8,7 @@ const list = computed(() => videos.value ?? [])
   <div>
     <div class="banner">
       <div class="banner-en">VIDEO TEACHING</div>
-      <h1>弘法影音</h1>
-      <p>法師開示 · 經典導讀 · 道場紀實</p>
+      <h1>法師說法</h1>
     </div>
     <div class="sec">
       <div class="grid3">

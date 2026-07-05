@@ -1,6 +1,7 @@
 <template>
   <div>
     <div
+      class="sutra-page-hero"
       style="
         padding: 60px 56px 50px;
         background: linear-gradient(180deg, #4a2a22, #3a211c);
@@ -34,7 +35,7 @@
         唐三藏法師玄奘奉詔譯
       </p>
     </div>
-    <div style="max-width: 860px; margin: 0 auto; padding: 60px 40px 80px">
+    <div class="sutra-content-wrap" style="max-width: 860px; margin: 0 auto; padding: 60px 40px 80px">
       <div class="sutra-quote" style="margin-bottom: 36px">
         <p
           style="

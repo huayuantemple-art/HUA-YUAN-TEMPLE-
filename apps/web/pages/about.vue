@@ -32,12 +32,16 @@ const values = computed(() =>
 
 <template>
   <div>
-    <div class="banner">
+    <div class="banner about-banner">
       <div class="banner-en">ABOUT US</div>
-      <h1>關於我們</h1>
-      <p>華圓覺苑 · 都會中的修行道場</p>
+      <h1>華圓覺苑簡介</h1>
+      <p>
+        華開舜若因緣多 <br />
+        勝境無窮更得安
+      </p>
     </div>
     <div
+      class="about-intro"
       style="
         max-width: 1000px;
         margin: 0 auto;
@@ -49,9 +53,12 @@ const values = computed(() =>
       "
     >
       <div>
-        <div class="sec-en" style="margin-bottom: 12px">緣起</div>
+        <div class="sec-en about-section-kicker" style="margin-bottom: 12px">
+          弘揚淨土 持戒念佛
+        </div>
         <!-- eslint-disable vue/no-v-html -- 內容已 escapeHtml,僅插入受控 <br>(同舊站) -->
         <h2
+          class="about-headline"
           style="
             font-family: 'Noto Serif TC', serif;
             font-weight: 500;
@@ -63,11 +70,12 @@ const values = computed(() =>
           "
           v-html="headlineHtml"
         ></h2>
-        <p style="font-size: 15px; color: #6b5a48; line-height: 2.1; margin: 0">
+        <p class="about-copy" style="font-size: 15px; color: #6b5a48; line-height: 2.1; margin: 0">
           {{ about?.content || '' }}
         </p>
       </div>
       <div
+        class="about-photo"
         style="
           aspect-ratio: 4/5;
           background: linear-gradient(150deg, #e7dcc4, #d6c7a4);

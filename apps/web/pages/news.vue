@@ -52,7 +52,7 @@ function dateParts(date: string | null) {
         </div>
       </div>
     </div>
-    <div style="max-width: 980px; margin: 0 auto; padding: 48px 40px 80px">
+    <div class="news-list-wrap" style="max-width: 980px; margin: 0 auto; padding: 48px 40px 80px">
       <div class="filters">
         <button
           v-for="f in filters"
@@ -70,7 +70,7 @@ function dateParts(date: string | null) {
           <div
             v-for="n in list"
             :key="n.id"
-            class="fadein"
+            class="news-list-item fadein"
             style="
               display: flex;
               gap: 28px;
@@ -79,7 +79,7 @@ function dateParts(date: string | null) {
               align-items: flex-start;
             "
           >
-            <div style="flex-shrink: 0; width: 100px; text-align: center">
+            <div class="news-list-date" style="flex-shrink: 0; width: 100px; text-align: center">
               <div
                 style="
                   font-family: 'Noto Serif TC', serif;
@@ -94,13 +94,13 @@ function dateParts(date: string | null) {
                 {{ dateParts(n.date).ym }}
               </div>
             </div>
-            <div style="flex-shrink: 0; padding-top: 3px">
+            <div class="news-list-tag" style="flex-shrink: 0; padding-top: 3px">
               <span
                 style="font-size: 12px; padding: 4px 12px; background: #3a211c; color: #c9a24b"
                 >{{ n.tag }}</span
               >
             </div>
-            <div style="flex: 1">
+            <div class="news-list-body" style="flex: 1">
               <div
                 style="
                   font-family: 'Noto Serif TC', serif;

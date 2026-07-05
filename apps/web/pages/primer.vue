@@ -9,10 +9,12 @@ const list = computed(() => docs.value ?? [])
   <div>
     <div class="banner">
       <div class="banner-en">DHARMA PRIMER</div>
-      <h1>入門佛法</h1>
-      <p>循序漸進，建立正知正見</p>
+      <h1>法寶略節</h1>
+      <p>華嚴經云:信為道元功德母,
+        增長一切諸善法
+        於至誠心深信恭敬</p>
     </div>
-    <div style="max-width: 1080px; margin: 0 auto; padding: 60px 40px 80px">
+    <div class="primer-wrap" style="max-width: 1080px; margin: 0 auto; padding: 60px 40px 80px">
       <div
         style="
           font-family: 'Noto Serif TC', serif;
@@ -55,7 +57,7 @@ const list = computed(() => docs.value ?? [])
         線上閱讀
       </div>
       <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px">
+      <div class="primer-reading-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px">
         <NuxtLink class="dharma-card" to="/dharma" style="text-align: left; display: block">
           <div
             style="
