@@ -554,7 +554,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:#F7F1E6;color:#2A1A16;min-
 //  Supabase 設定
 // ════════════════════
 const SUPABASE_URL     = 'https://cnsgjxqdyuondthmoqwf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuc2dqeHFkeXVvbmR0aG1vcXdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMzQ0NzgsImV4cCI6MjA5ODcxMDQ3OH0.2_yP-JaVLlA9BuC_0uxNr4P85OJ8FowrHP8Ffx3AgF8';
+const SUPABASE_ANON_KEY = 'sb_publishable_MIlOAMxDIBzqRvDAxeOMCA_-YU-xQtW';
 const GITHUB_PDF       = 'https://huayuantemple-art.github.io/HUA-YUAN-TEMPLE-/pdfs/';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -753,10 +753,34 @@ async function renderContact() {
       <div class="contact-info-row"><div class="contact-label">時間</div><div class="contact-val">${h(data.hours||'')}</div></div>
       ${data.transport?`<div class="contact-info-row"><div class="contact-label">交通</div><div class="contact-val">${h(data.transport)}</div></div>`:''}
     </div>`;
-  // map
+  // map(map_embed 只存 Google Maps 嵌入網址;經白名單驗證後以受控樣板組 iframe,不輸出原始 HTML)
   const map = document.getElementById('mapEmbed');
-  if (map && data.map_embed) map.innerHTML = data.map_embed;
-  else if (map) map.innerHTML = '<div style="padding:40px;text-align:center;color:#8a6f55">地圖嵌入碼尚未設定</div>';
+  if (map) renderMapEmbed(map, data.map_embed);
+}
+
+const MAP_EMBED_WHITELIST = [
+  'https://www.google.com/maps/embed',
+  'https://maps.google.com/maps',
+];
+function renderMapEmbed(el, value) {
+  el.innerHTML = '';
+  let src = (value || '').trim();
+  // 兼容尚未遷移的舊 iframe HTML:僅取出 src,不輸出其餘內容
+  const legacy = src.match(/<iframe[^>]*\ssrc="([^"]+)"/i);
+  if (legacy) src = legacy[1];
+  if (!MAP_EMBED_WHITELIST.some(prefix => src.startsWith(prefix))) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:#8a6f55">地圖嵌入碼尚未設定</div>';
+    return;
+  }
+  const iframe = document.createElement('iframe');
+  iframe.src = src;
+  iframe.width = '100%';
+  iframe.height = '280';
+  iframe.style.border = '0';
+  iframe.loading = 'lazy';
+  iframe.allowFullscreen = true;
+  iframe.referrerPolicy = 'no-referrer-when-downgrade';
+  el.appendChild(iframe);
 }
 
 // ── ABOUT ──
