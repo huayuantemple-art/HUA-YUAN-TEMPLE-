@@ -9,17 +9,24 @@
   "scripts": {
     "dev:web": "pnpm --filter @huayuan/web dev",
     "build:web": "pnpm --filter @huayuan/web build",
+    "dev:admin": "pnpm --filter @huayuan/admin dev",
+    "build:admin": "pnpm --filter @huayuan/admin build",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.0",
+    "@playwright/test": "^1.61.1",
+    "@types/pngjs": "^6.0.5",
     "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.0",
     "eslint-plugin-vue": "^10.3.0",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.6.0",
     "typescript": "^5.8.0",
     "typescript-eslint": "^8.35.0"

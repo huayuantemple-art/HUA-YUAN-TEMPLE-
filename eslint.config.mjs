@@ -41,5 +41,13 @@ export default tseslint.config(
       'no-irregular-whitespace': 'off',
     },
   },
+  {
+    // 後台根元件 App.vue 為單字命名;文案原樣移植舊站 admin.html
+    files: ['apps/admin/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'no-irregular-whitespace': 'off',
+    },
+  },
   prettier,
 )

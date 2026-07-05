@@ -12,4 +12,5 @@ openspec/
 supabase/migrations/
 .claude/
 .codex/
+.agents/
 README.md

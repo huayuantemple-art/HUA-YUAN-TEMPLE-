@@ -16,8 +16,11 @@ dist/
 # editor / os
 .DS_Store
 .idea/
+.codex/config.toml
+.claude/settings.local.json
 
 # test
 coverage/
 playwright-report/
 test-results/
+.vercel
