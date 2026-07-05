@@ -131,18 +131,34 @@ describe('createApi:repository 行為', () => {
     expect(params).toEqual({ select: '*', status: 'eq.已發布', order: 'created_at.desc' })
   })
 
-  it('about.upsert 帶 merge-duplicates 與固定 id=1', async () => {
+  it('about.upsert 先 PATCH 固定 id=1(RLS 只授 admin UPDATE,不走 POST upsert)', async () => {
     const api = createApi(BASE)
-    let prefer = ''
-    let body: Record<string, unknown> = {}
+    const calls: Array<{ method: string; params: Record<string, unknown>; body: unknown }> = []
     api.http.defaults.adapter = fakeAdapter((config) => {
-      prefer = String(AxiosHeaders.from(config.headers).Prefer)
-      body = JSON.parse(String(config.data)) as Record<string, unknown>
+      calls.push({
+        method: String(config.method),
+        params: { ...(config.params as Record<string, unknown>) },
+        body: JSON.parse(String(config.data)) as unknown,
+      })
       return { status: 200, data: [{ id: 1 }] }
     })
 
     await api.about.upsert({ headline: '新標題' })
-    expect(prefer).toContain('resolution=merge-duplicates')
-    expect(body).toEqual({ id: 1, headline: '新標題' })
+    expect(calls).toEqual([
+      { method: 'patch', params: { id: 'eq.1' }, body: { headline: '新標題' } },
+    ])
+  })
+
+  it('about.upsert 於列不存在(PATCH 無命中)時改走 INSERT', async () => {
+    const api = createApi(BASE)
+    const methods: string[] = []
+    api.http.defaults.adapter = fakeAdapter((config) => {
+      methods.push(String(config.method))
+      return { status: 200, data: config.method === 'patch' ? [] : [{ id: 1 }] }
+    })
+
+    const row = await api.about.upsert({ headline: '新標題' })
+    expect(methods).toEqual(['patch', 'post'])
+    expect(row).toEqual({ id: 1 })
   })
 })

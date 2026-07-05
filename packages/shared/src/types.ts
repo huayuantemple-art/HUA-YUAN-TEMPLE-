@@ -9,7 +9,7 @@ export interface Profile {
   created_at: string
 }
 
-export type AnnouncementStatus = '草稿' | '已發布'
+export type AnnouncementStatus = '草稿' | '已發布' | '隱藏'
 
 export interface Announcement {
   id: number
@@ -65,6 +65,7 @@ export interface About {
 
 export interface Contact {
   id: number
+  venue_name: string | null
   address: string | null
   phone: string | null
   email: string | null
@@ -72,6 +73,12 @@ export interface Contact {
   transport: string | null
   /** 只儲存 Google Maps 嵌入網址(不存原始 HTML,見 content-sanitization spec) */
   map_embed: string | null
+  venue_name2: string | null
+  address2: string | null
+  phone2: string | null
+  transport2: string | null
+  /** 第二組 Google Maps 嵌入網址 */
+  map_embed2: string | null
 }
 
 export interface Registration {

@@ -49,15 +49,23 @@ function singletonRepo<Row extends { id: number }>(http: AxiosInstance, table: s
       })
       return data[0] ?? null
     },
+    /**
+     * upsert 至固定 id=1:先 UPDATE,列不存在時才 INSERT。
+     * 不用 PostgREST 的 POST + merge-duplicates:那需要 INSERT 權限,
+     * 而 RLS 只授予 admin UPDATE(見 database-security spec 1.5)
+     */
     async upsert(row: Partial<Row>): Promise<Row | null> {
-      const { data } = await http.post<Row[]>(
+      const { data } = await http.patch<Row[]>(`/${table}`, row, {
+        params: { id: 'eq.1' },
+        headers: { Prefer: 'return=representation' },
+      })
+      if (data[0]) return data[0]
+      const { data: inserted } = await http.post<Row[]>(
         `/${table}`,
         { id: 1, ...row },
-        {
-          headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-        },
+        { headers: { Prefer: 'return=representation' } },
       )
-      return data[0] ?? null
+      return inserted[0] ?? null
     },
   }
 }
@@ -103,8 +111,9 @@ export function createApi(options: ApiOptions) {
     about: singletonRepo<About>(http, 'about'),
     contact: singletonRepo<Contact>(http, 'contact'),
     registrations: {
-      /** 後台:檢視/匯出(RLS 僅 admin 可讀) */
-      listAll: () => registrationsBase.list({ order: 'created_at.desc' }),
+      /** 後台:檢視/匯出(RLS 僅 admin 可讀);可帶 PostgREST 條件如 course_id=eq.N */
+      listAll: (params: Record<string, string> = {}) =>
+        registrationsBase.list({ order: 'created_at.desc', ...params }),
       /**
        * 匿名報名:return=minimal — anon 依 RLS 無 SELECT 權限,
        * 要求 representation 會被拒(42501)
