@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { resolveMapEmbedSrc } from '@huayuan/shared'
 import type { Contact } from '@huayuan/shared'
+import defaultContactIconUrl from '~/assets/img/huayuan-logo.png'
 
 const api = useApi()
 const { data: contact, pending } = useLazyAsyncData('contact', () => api.contact.get())
@@ -9,6 +10,16 @@ const { data: contact, pending } = useLazyAsyncData('contact', () => api.contact
 const mapSrc = computed(() => resolveMapEmbedSrc(contact.value?.map_embed))
 const mapSrc2 = computed(() => resolveMapEmbedSrc(contact.value?.map_embed2))
 
+function resolveContactIcon(iconUrl: string | null | undefined) {
+  return iconUrl?.trim() || defaultContactIconUrl
+}
+
+function useDefaultContactIcon(event: Event) {
+  const img = event.target as HTMLImageElement
+  img.onerror = null
+  img.src = defaultContactIconUrl
+}
+
 function venues(row: Contact | null) {
   if (!row) return []
   return [
@@ -16,6 +27,7 @@ function venues(row: Contact | null) {
       name: row.venue_name,
       address: row.address,
       phone: row.phone,
+      iconUrl: row.icon_url,
       transport: row.transport,
       map: mapSrc.value,
     },
@@ -23,6 +35,7 @@ function venues(row: Contact | null) {
       name: row.venue_name2,
       address: row.address2,
       phone: row.phone2,
+      iconUrl: row.icon_url2,
       transport: row.transport2,
       map: mapSrc2.value,
     },
@@ -42,12 +55,18 @@ function venues(row: Contact | null) {
       <div v-else-if="!contact" class="empty-msg">聯絡資訊載入中，請稍候。</div>
       <template v-else>
         <section class="contact-section">
-          <h1 class="contact-section-title">聯絡資訊</h1>
-          <div class="contact-title-line"></div>
+          <h2 class="contact-section-title">聯絡資訊</h2>
           <div class="contact-venues">
             <div v-for="(venue, index) in venues(contact)" :key="index" class="contact-venue">
-              <div class="contact-icon" aria-hidden="true">⊕</div>
-              <div>
+              <img
+                class="contact-venue-icon"
+                :src="resolveContactIcon(venue.iconUrl)"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                @error="useDefaultContactIcon"
+              />
+              <div class="contact-venue-body">
                 <div class="contact-item-title">{{ venue.name || `道場地址 ${index + 1}` }}</div>
                 <div v-if="venue.address" class="contact-address">{{ venue.address }}</div>
                 <div v-if="venue.phone" class="contact-phone">{{ venue.phone }}</div>
@@ -61,7 +80,6 @@ function venues(row: Contact | null) {
           class="contact-section contact-transport-section"
         >
           <h2 class="contact-section-title">交通方式</h2>
-          <div class="contact-title-line"></div>
           <div class="contact-transport-list">
             <div v-if="contact.transport" class="contact-transport-row">
               <span class="contact-transport-tag">交通</span>
@@ -76,7 +94,6 @@ function venues(row: Contact | null) {
 
         <section class="contact-section">
           <h2 class="contact-section-title">道場位置</h2>
-          <div class="contact-title-line"></div>
           <div v-if="mapSrc || mapSrc2" class="contact-map-list">
             <iframe
               v-if="mapSrc"

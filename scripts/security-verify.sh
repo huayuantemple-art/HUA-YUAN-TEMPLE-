@@ -68,6 +68,27 @@ check "SELECT contact"                   "$(req GET "contact?select=id")" '^200\
 echo "== 匿名報名(INSERT registrations)仍正常 =="
 check "INSERT registrations 成功(201,return=minimal 同 signup-form 行為)" "$(req POST "registrations" '{"name":"__RLS_TEST__","phone":"000"}' 'return=minimal')" '^201'
 
+echo "== Storage 匿名權限 =="
+storage_req() { # method bucket path body
+  local method="$1" bucket="$2" path="$3" body="${4:-}"
+  local args=(-sS -X "$method" "${SUPABASE_URL}/storage/v1/object/${bucket}/${path}" \
+    -H "apikey: ${ANON_KEY}" -H "Authorization: Bearer ${ANON_KEY}" \
+    -H "Content-Type: image/webp" -w $'\n%{http_code}')
+  [[ -n "$body" ]] && args+=(-d "$body")
+  local out
+  out="$(curl "${args[@]}")"
+  echo "${out##*$'\n'}|${out%$'\n'*}"
+}
+storage_public_req() { # bucket path
+  local bucket="$1" path="$2" out
+  out="$(curl -sS "${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}" \
+    -H "apikey: ${ANON_KEY}" -H "Authorization: Bearer ${ANON_KEY}" -w $'\n%{http_code}')"
+  echo "${out##*$'\n'}|${out%$'\n'*}"
+}
+check "匿名 INSERT pdfs 被拒" "$(storage_req POST pdfs rls-test.pdf x)" '^40[013]'
+check "匿名 INSERT images 被拒" "$(storage_req POST images rls-test.webp x)" '^40[013]'
+check "匿名可走 images public 讀取端點(不存在可 Object not found,但不可權限拒絕)" "$(storage_public_req images rls-test.webp)" '^(2..\||400\|.*Object not found)'
+
 echo
 echo "PASS=${PASS} FAIL=${FAIL}"
 [[ $FAIL -eq 0 ]] || exit 1

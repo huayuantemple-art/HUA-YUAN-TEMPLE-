@@ -10,4 +10,4 @@ export {
 } from './api/http'
 export { createApi, type Api, type ApiOptions } from './api/repositories'
 export { escapeHtml, resolveMapEmbedSrc, MAP_EMBED_WHITELIST } from './sanitize'
-export { storagePublicUrl, PDF_BUCKET } from './storage'
+export { storagePublicUrl, versionedStoragePublicUrl, PDF_BUCKET, IMAGE_BUCKET } from './storage'

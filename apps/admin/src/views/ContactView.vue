@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { resolveMapEmbedSrc } from '@huayuan/shared'
+import defaultContactIconUrl from '../assets/huayuan-logo.png'
 import { api } from '../lib/api'
+import { uploadSiteImage } from '../lib/imageUpload'
 import { toast } from '../lib/toast'
 
 function isSchemaCacheMiss(error: unknown) {
@@ -17,14 +19,18 @@ const form = reactive({
   venue_name: '',
   address: '',
   phone: '',
+  icon_url: '',
   transport: '',
   map_embed: '',
   venue_name2: '',
   address2: '',
   phone2: '',
+  icon_url2: '',
   transport2: '',
   map_embed2: '',
 })
+
+const uploadingIcon = ref<1 | 2 | null>(null)
 
 onMounted(async () => {
   const row = await api.contact.get().catch(() => null)
@@ -33,11 +39,13 @@ onMounted(async () => {
     venue_name: row.venue_name ?? '',
     address: row.address ?? '',
     phone: row.phone ?? '',
+    icon_url: row.icon_url ?? '',
     transport: row.transport ?? '',
     map_embed: row.map_embed ?? '',
     venue_name2: row.venue_name2 ?? '',
     address2: row.address2 ?? '',
     phone2: row.phone2 ?? '',
+    icon_url2: row.icon_url2 ?? '',
     transport2: row.transport2 ?? '',
     map_embed2: row.map_embed2 ?? '',
   })
@@ -49,6 +57,30 @@ function normalizeMapInput(input: string): string | null {
   const map = input.trim()
   if (!map) return ''
   return resolveMapEmbedSrc(map)
+}
+
+async function uploadIcon(event: Event, slot: 1 | 2) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+
+  uploadingIcon.value = slot
+  try {
+    const url = await uploadSiteImage(file, `contact-icon-${slot}`, 'icon')
+    if (slot === 1) form.icon_url = url
+    else form.icon_url2 = url
+    toast(`道場 icon ${slot} 已上傳，請儲存變更`)
+  } catch (error) {
+    toast('上傳失敗：' + (error as Error).message, true)
+  } finally {
+    uploadingIcon.value = null
+  }
+}
+
+function clearIcon(slot: 1 | 2) {
+  if (slot === 1) form.icon_url = ''
+  else form.icon_url2 = ''
 }
 
 async function save() {
@@ -64,11 +96,13 @@ async function save() {
       venue_name: form.venue_name,
       address: form.address,
       phone: form.phone,
+      icon_url: form.icon_url || null,
       transport: form.transport,
       map_embed: map,
       venue_name2: form.venue_name2,
       address2: form.address2,
       phone2: form.phone2,
+      icon_url2: form.icon_url2 || null,
       transport2: form.transport2,
       map_embed2: map2,
     })
@@ -105,6 +139,25 @@ async function save() {
         </div>
       </div>
       <div class="fr">
+        <label class="lbl">道場 icon</label>
+        <div class="image-field">
+          <img
+            class="image-thumb image-thumb-icon"
+            :src="form.icon_url || defaultContactIconUrl"
+            alt=""
+          />
+          <div class="image-actions">
+            <input type="file" class="inp" accept="image/*" @change="uploadIcon($event, 1)" />
+            <button class="btn btn-outline btn-sm" type="button" @click="clearIcon(1)">
+              清除回預設 logo
+            </button>
+            <div class="text-muted" style="font-size: 12px">
+              {{ uploadingIcon === 1 ? '上傳中…' : '自動壓縮為長邊 256px' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fr">
         <label class="lbl">交通方式</label>
         <textarea v-model="form.transport" class="inp" rows="3"></textarea>
       </div>
@@ -137,6 +190,25 @@ async function save() {
         <div>
           <label class="lbl">聯絡電話</label>
           <input v-model="form.phone2" class="inp" />
+        </div>
+      </div>
+      <div class="fr">
+        <label class="lbl">道場 icon</label>
+        <div class="image-field">
+          <img
+            class="image-thumb image-thumb-icon"
+            :src="form.icon_url2 || defaultContactIconUrl"
+            alt=""
+          />
+          <div class="image-actions">
+            <input type="file" class="inp" accept="image/*" @change="uploadIcon($event, 2)" />
+            <button class="btn btn-outline btn-sm" type="button" @click="clearIcon(2)">
+              清除回預設 logo
+            </button>
+            <div class="text-muted" style="font-size: 12px">
+              {{ uploadingIcon === 2 ? '上傳中…' : '自動壓縮為長邊 256px' }}
+            </div>
+          </div>
         </div>
       </div>
       <div class="fr">

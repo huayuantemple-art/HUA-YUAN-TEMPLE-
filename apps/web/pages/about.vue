@@ -4,29 +4,39 @@ import { escapeHtml } from '@huayuan/shared'
 const api = useApi()
 const { data: about } = useLazyAsyncData('about', () => api.about.get())
 
+const defaultValues = [
+  {
+    char: '慈',
+    name: '慈悲利他',
+    desc: '以慈悲心待人，以利他行入世，將佛法的溫度帶入社會。',
+  },
+  {
+    char: '智',
+    name: '智慧明燈',
+    desc: '研讀經典、深入法義，以般若智慧照破無明煩惱。',
+  },
+  {
+    char: '淨',
+    name: '清淨自在',
+    desc: '持戒修定，淨化身心，於喧囂中安住一份自在清涼。',
+  },
+]
+
 // 同舊站:headline 逃逸後將全形空白換成 <br>(僅插入受控標籤,內容已逃逸)
 const headlineHtml = computed(() => escapeHtml(about.value?.headline || '').replace('　', '<br>'))
+const contentHtml = computed(() => escapeHtml(about.value?.content || '').replace(/\n/g, '<br>'))
+const aboutImageUrl = computed(() => about.value?.image_url?.trim() || '')
 
 const values = computed(() =>
-  about.value
-    ? [
-        {
-          char: '慈',
-          name: about.value.value1 || '慈悲利他',
-          desc: '以慈悲心待人，以利他行入世，將佛法的溫度帶入社會。',
-        },
-        {
-          char: '智',
-          name: about.value.value2 || '智慧明燈',
-          desc: '研讀經典、深入法義，以般若智慧照破無明煩惱。',
-        },
-        {
-          char: '淨',
-          name: about.value.value3 || '清淨自在',
-          desc: '持戒修定，淨化身心，於喧囂中安住一份自在清涼。',
-        },
-      ]
-    : [],
+  defaultValues.map((fallback, index) => {
+    const key = `value${index + 1}` as 'value1' | 'value2' | 'value3'
+    const descKey = `${key}_desc` as 'value1_desc' | 'value2_desc' | 'value3_desc'
+    return {
+      char: fallback.char,
+      name: escapeHtml(about.value?.[key] || fallback.name),
+      desc: escapeHtml(about.value?.[descKey] || fallback.desc),
+    }
+  }),
 )
 </script>
 
@@ -53,9 +63,7 @@ const values = computed(() =>
       "
     >
       <div>
-        <div class="sec-en about-section-kicker" style="margin-bottom: 12px">
-          弘揚淨土 持戒念佛
-        </div>
+        <div class="sec-en about-section-kicker" style="margin-bottom: 12px">弘揚淨土 持戒念佛</div>
         <!-- eslint-disable vue/no-v-html -- 內容已 escapeHtml,僅插入受控 <br>(同舊站) -->
         <h2
           class="about-headline"
@@ -70,11 +78,15 @@ const values = computed(() =>
           "
           v-html="headlineHtml"
         ></h2>
-        <p class="about-copy" style="font-size: 15px; color: #6b5a48; line-height: 2.1; margin: 0">
-          {{ about?.content || '' }}
-        </p>
+        <!-- eslint-disable vue/no-v-html -- DB 文字已 escapeHtml,僅保留換行 -->
+        <p
+          class="about-copy"
+          style="font-size: 15px; color: #6b5a48; line-height: 2.1; margin: 0"
+          v-html="contentHtml"
+        ></p>
       </div>
       <div
+        v-if="!aboutImageUrl"
         class="about-photo"
         style="
           aspect-ratio: 4/5;
@@ -90,6 +102,19 @@ const values = computed(() =>
       >
         道場意境照片
       </div>
+      <img
+        v-else
+        class="about-photo"
+        :src="aboutImageUrl"
+        alt="道場意境照片"
+        style="
+          width: 100%;
+          aspect-ratio: 4/5;
+          object-fit: cover;
+          border: 1px solid rgba(201, 162, 75, 0.4);
+          display: block;
+        "
+      />
     </div>
     <div class="sec-dark">
       <div class="sec-dark-inner">
@@ -107,8 +132,9 @@ const values = computed(() =>
         <div class="grid3">
           <div v-for="v in values" :key="v.char" class="value-item fadein">
             <div class="value-char">{{ v.char }}</div>
-            <div class="value-name">{{ v.name }}</div>
-            <p class="value-desc">{{ v.desc }}</p>
+            <!-- eslint-disable vue/no-v-html -- DB 文字已 escapeHtml -->
+            <div class="value-name" v-html="v.name"></div>
+            <p class="value-desc" v-html="v.desc"></p>
           </div>
         </div>
       </div>

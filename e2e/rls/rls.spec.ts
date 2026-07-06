@@ -92,3 +92,28 @@ test('匿名 Storage 上傳 pdfs 被拒(task 7.1 RLS)', async ({ request }) => {
   })
   expect([400, 401, 403]).toContain(resp.status())
 })
+
+test('匿名 Storage 上傳 images 被拒(admin-content-coverage RLS)', async ({ request }) => {
+  const resp = await request.post(`${SUPABASE_URL}/storage/v1/object/images/rls-test.webp`, {
+    headers: {
+      apikey: ANON_KEY,
+      Authorization: `Bearer ${ANON_KEY}`,
+      'Content-Type': 'image/webp',
+    },
+    data: 'x',
+  })
+  expect([400, 401, 403]).toContain(resp.status())
+})
+
+test('匿名可走 images public object 讀取端點', async ({ request }) => {
+  const resp = await request.get(`${SUPABASE_URL}/storage/v1/object/public/images/rls-test.webp`, {
+    headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+  })
+  expect(resp.status()).not.toBe(401)
+  expect(resp.status()).not.toBe(403)
+  if (resp.status() === 400) {
+    const body = await resp.json()
+    expect(body.statusCode).toBe('404')
+    expect(body.message).toContain('Object not found')
+  }
+})

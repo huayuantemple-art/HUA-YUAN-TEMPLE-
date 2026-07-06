@@ -58,9 +58,13 @@ export interface About {
   id: number
   headline: string | null
   content: string | null
+  image_url: string | null
   value1: string | null
+  value1_desc: string | null
   value2: string | null
+  value2_desc: string | null
   value3: string | null
+  value3_desc: string | null
 }
 
 export interface Contact {
@@ -68,14 +72,14 @@ export interface Contact {
   venue_name: string | null
   address: string | null
   phone: string | null
-  email: string | null
-  hours: string | null
+  icon_url: string | null
   transport: string | null
   /** 只儲存 Google Maps 嵌入網址(不存原始 HTML,見 content-sanitization spec) */
   map_embed: string | null
   venue_name2: string | null
   address2: string | null
   phone2: string | null
+  icon_url2: string | null
   transport2: string | null
   /** 第二組 Google Maps 嵌入網址 */
   map_embed2: string | null
