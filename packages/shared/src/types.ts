@@ -66,6 +66,32 @@ export interface Sutra {
   created_at: string
 }
 
+export type DharmaSectionStatus = '草稿' | '已發布'
+
+/** 法要章節為固定枚舉:錨點與版面樣式綁章節,不開放後台增刪(見 dharma-cms design) */
+export const DHARMA_GROUP_KEYS = ['intro', 'sanjie', 'wujie', 'sanxue'] as const
+
+export type DharmaGroupKey = (typeof DHARMA_GROUP_KEYS)[number]
+
+export const DHARMA_GROUP_LABELS: Record<DharmaGroupKey, string> = {
+  intro: '序經',
+  sanjie: '三皈依',
+  wujie: '五戒',
+  sanxue: '三學',
+}
+
+export interface DharmaSection {
+  id: number
+  group_key: DharmaGroupKey
+  /** 小節標題;null 時前台呈現為置中經句框(sutra-box) */
+  title: string | null
+  /** 純文字,段落以換行分隔(不存 HTML/Markdown) */
+  content: string
+  seq: number
+  status: DharmaSectionStatus
+  created_at: string
+}
+
 export interface About {
   id: number
   headline: string | null

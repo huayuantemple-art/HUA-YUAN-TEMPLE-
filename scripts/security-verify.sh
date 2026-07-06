@@ -40,11 +40,12 @@ insert_payload() {
     courses)       echo '{"name":"pwn"}' ;;
     videos)        echo '{"title":"pwn"}' ;;
     documents)     echo '{"name":"pwn","filename":"pwn.pdf"}' ;;
+    dharma_sections) echo '{"group_key":"sanjie","content":"pwn","seq":1}' ;;
   esac
 }
 
 echo "== 匿名寫入必須全部被拒 =="
-for t in announcements courses videos documents; do
+for t in announcements courses videos documents dharma_sections; do
   check "INSERT ${t} 被拒(401/403)"        "$(req POST  "$t" "$(insert_payload "$t")")" '^40[13]'
   check "UPDATE ${t} 無任何列被改(空集合)" "$(req PATCH "$t?id=gt.0" '{"status":"pwned"}')" '^(2..\|\[\]|4)'
   check "DELETE ${t} 無任何列被刪(空集合)" "$(req DELETE "$t?id=gt.0")" '^(2..\|\[\]|4)'
@@ -64,6 +65,8 @@ check "SELECT announcements(僅已發布)" "$(req GET "announcements?select=id&l
 check "SELECT courses(僅公開狀態)"     "$(req GET "courses?select=id&limit=1")" '^200\|'
 check "SELECT about"                     "$(req GET "about?select=id")" '^200\|'
 check "SELECT contact"                   "$(req GET "contact?select=id")" '^200\|'
+check "SELECT dharma_sections(已發布可讀)" "$(req GET "dharma_sections?select=id&limit=1")" '^200\|'
+check "SELECT dharma_sections 草稿回空集合" "$(req GET "dharma_sections?select=id&status=eq.%E8%8D%89%E7%A8%BF")" '^200\|\[\]$'
 
 echo "== 匿名報名(INSERT registrations)仍正常 =="
 check "INSERT registrations 成功(201,return=minimal 同 signup-form 行為)" "$(req POST "registrations" '{"name":"__RLS_TEST__","phone":"000"}' 'return=minimal')" '^201'

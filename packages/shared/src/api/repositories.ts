@@ -5,6 +5,7 @@ import type {
   Announcement,
   Contact,
   Course,
+  DharmaSection,
   DocumentRow,
   NewRegistration,
   Registration,
@@ -82,6 +83,7 @@ export function createApi(options: ApiOptions) {
   const videos = tableRepo<Video>(http, 'videos')
   const documents = tableRepo<DocumentRow>(http, 'documents')
   const sutras = tableRepo<Sutra>(http, 'sutras')
+  const dharmaSections = tableRepo<DharmaSection>(http, 'dharma_sections')
   const registrationsBase = tableRepo<Registration>(http, 'registrations')
 
   return {
@@ -127,6 +129,13 @@ export function createApi(options: ApiOptions) {
         return rows[0] ?? null
       },
       listAll: () => sutras.list({ order: 'seq.asc' }),
+    },
+    dharmaSections: {
+      ...dharmaSections,
+      /** 前台:僅已發布,依 seq 排序(章節分組順序由固定枚舉決定,於頁面組裝) */
+      listPublished: () =>
+        dharmaSections.list({ status: 'eq.已發布', order: 'group_key.asc,seq.asc' }),
+      listAll: () => dharmaSections.list({ order: 'group_key.asc,seq.asc' }),
     },
     about: singletonRepo<About>(http, 'about'),
     contact: singletonRepo<Contact>(http, 'contact'),
