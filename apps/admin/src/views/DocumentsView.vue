@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref } from 'vue'
+import { useDialog, type DataTableColumns } from 'naive-ui'
 import {
   PDF_BUCKET,
   storagePublicUrl,
   type DocumentRow,
   type DocumentStatus,
 } from '@huayuan/shared'
+import AdminDataTable from '../components/AdminDataTable.vue'
 import AppDrawer from '../components/AppDrawer.vue'
 import { useDrawer } from '../composables/useDrawer'
 import { api } from '../lib/api'
 import { badgeClass } from '../lib/badge'
+import { supabase } from '../lib/supabase'
 import { toast } from '../lib/toast'
 import { useDataStore } from '../stores/data'
 import { useUiStore } from '../stores/ui'
@@ -17,6 +20,8 @@ import { useUiStore } from '../stores/ui'
 const data = useDataStore()
 const ui = useUiStore()
 const { visible, open, openDrawer, closeDrawer } = useDrawer()
+const dialog = useDialog()
+const uploadingFile = ref(false)
 
 // 檔案改存 Supabase Storage(task 5.10;bucket/組法單一來源在 packages/shared)
 const pdfUrl = (filename: string) =>
@@ -37,6 +42,54 @@ const urlPreview = computed(() => {
   const fn = form.filename.trim()
   return fn ? pdfUrl(fn) : pdfBase + '…'
 })
+
+const DOCUMENT_FILE_TYPES: Record<string, string> = {
+  pdf: 'application/pdf',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+}
+
+function documentFileExtension(file: File): 'pdf' | 'docx' | null {
+  const extension = file.name.split('.').pop()?.toLowerCase()
+  return extension === 'pdf' || extension === 'docx' ? extension : null
+}
+
+function documentStoragePath(file: File): string {
+  const extension = documentFileExtension(file) ?? 'pdf'
+  const fallback = `document-${Date.now()}.pdf`
+  const filename = file.name.split(/[\\/]/).pop()?.trim() || fallback
+  const safeName = filename.replace(/\s+/g, '-').replace(/[?#]/g, '')
+  return safeName.toLowerCase().endsWith(`.${extension}`) ? safeName : `${safeName}.${extension}`
+}
+
+async function uploadDocumentFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  const extension = documentFileExtension(file)
+  if (!extension) {
+    toast('請選擇 PDF 或 DOCX 檔', true)
+    input.value = ''
+    return
+  }
+
+  const path = documentStoragePath(file)
+  uploadingFile.value = true
+  try {
+    const { error } = await supabase.storage.from(PDF_BUCKET).upload(path, file, {
+      cacheControl: '3600',
+      contentType: DOCUMENT_FILE_TYPES[extension],
+      upsert: true,
+    })
+    if (error) throw error
+    form.filename = path
+    toast('檔案已上傳')
+  } catch (error) {
+    toast('上傳失敗：' + (error as Error).message, true)
+  } finally {
+    uploadingFile.value = false
+    input.value = ''
+  }
+}
 
 function openNew() {
   drawerTitle.value = '新增佛法文檔'
@@ -64,7 +117,7 @@ async function save() {
     status: form.status,
   }
   if (!p.filename) {
-    toast('請填入 PDF 檔名', true)
+    toast('請填入檔名或上傳檔案', true)
     return
   }
   try {
@@ -79,8 +132,22 @@ async function save() {
   await data.reloadDocuments()
 }
 
-async function del(id: number) {
-  if (!confirm('確定刪除此文檔記錄？（Storage 上的 PDF 不受影響）')) return
+function del(document: DocumentRow) {
+  dialog.warning({
+    title: '確認刪除文檔記錄',
+    content: `確定刪除「${document.name}」？Storage 上的 PDF 不受影響。`,
+    positiveText: '刪除',
+    negativeText: '取消',
+    autoFocus: false,
+    positiveButtonProps: { type: 'error', secondary: true },
+    negativeButtonProps: { secondary: true },
+    async onPositiveClick() {
+      await removeDocument(document.id)
+    },
+  })
+}
+
+async function removeDocument(id: number) {
   try {
     await api.documents.remove(id)
   } catch (error) {
@@ -91,6 +158,76 @@ async function del(id: number) {
   toast('已刪除')
 }
 
+const columns: DataTableColumns<DocumentRow> = [
+  {
+    title: '文檔名稱',
+    key: 'name',
+    ellipsis: { tooltip: true },
+    render: (row) =>
+      h('span', { class: 'flex items-center gap-[10px]' }, [
+        h(
+          'span',
+          {
+            class:
+              'flex size-7 shrink-0 items-center justify-center rounded-md bg-[#f2e4c8] text-xs text-[var(--gold)]',
+          },
+          '▤',
+        ),
+        h('span', row.name),
+      ]),
+  },
+  {
+    title: '說明',
+    key: 'description',
+    ellipsis: { tooltip: true },
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.description || '—'),
+  },
+  {
+    title: '檔名（pdfs/…）',
+    key: 'filename',
+    width: 160,
+    ellipsis: { tooltip: true },
+    render: (row) =>
+      h(
+        'a',
+        {
+          href: pdfUrl(row.filename),
+          target: '_blank',
+          class: 'text-xs text-[var(--gold)] no-underline',
+          title: '開啟檔案',
+        },
+        `${row.filename} ↗`,
+      ),
+  },
+  {
+    title: '狀態',
+    key: 'status',
+    width: 86,
+    render: (row) => h('span', { class: ['badge', badgeClass(row.status)] }, row.status),
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 110,
+    align: 'right',
+    render: (row) =>
+      h('span', { class: 'inline-flex items-center justify-end gap-[10px] whitespace-nowrap' }, [
+        h(
+          'button',
+          {
+            type: 'button',
+            class:
+              'edit-link appearance-none border-0 bg-transparent p-0 font-[inherit] leading-[inherit]',
+            onClick: () => openEdit(row),
+          },
+          '編輯',
+        ),
+        h('span', { class: 'divider' }, '|'),
+        h('button', { type: 'button', class: 'btn-del', onClick: () => del(row) }, '刪除'),
+      ]),
+  },
+]
+
 onMounted(() => {
   if (ui.consumeDrawer('documents')) setTimeout(openNew, 100)
 })
@@ -99,73 +236,17 @@ onMounted(() => {
 <template>
   <div>
     <div class="row-between">
-      <div class="text-muted" style="font-size: 14px">
-        PDF 上傳至 Supabase Storage <code>pdfs</code> bucket，此處管理顯示資訊
-      </div>
       <button class="btn btn-dark" @click="openNew">＋ 新增文檔</button>
     </div>
 
-    <div class="upload-zone mb-2">
-      <div class="uz-icon">⬆</div>
-      <p>PDF 請上傳至 Supabase Storage 的 <strong>pdfs</strong> bucket</p>
-      <small>上傳後在下方填入檔名即可自動產生下載連結</small>
-    </div>
-
-    <div class="card">
-      <div class="th" style="grid-template-columns: 1fr 1fr 160px 86px 110px">
-        <span>文檔名稱</span><span>說明</span><span>檔名（pdfs/…）</span><span>狀態</span>
-        <span style="text-align: right">操作</span>
-      </div>
-      <div v-if="!data.loaded" class="loading">讀取中…</div>
-      <div v-else-if="!data.documents.length" class="empty">尚無文檔，點擊「新增文檔」開始新增</div>
-      <template v-else>
-        <div
-          v-for="d in data.documents"
-          :key="d.id"
-          class="tr"
-          style="grid-template-columns: 1fr 1fr 160px 86px 110px"
-        >
-          <span style="display: flex; align-items: center; gap: 10px">
-            <span
-              style="
-                width: 28px;
-                height: 28px;
-                border-radius: 6px;
-                background: #f2e4c8;
-                color: var(--gold);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                flex-shrink: 0;
-              "
-            >
-              ▤
-            </span>
-            <span>{{ d.name }}</span>
-          </span>
-          <span class="text-muted" style="font-size: 13px">{{ d.description || '—' }}</span>
-          <span>
-            <a
-              :href="pdfUrl(d.filename)"
-              target="_blank"
-              style="font-size: 12px; color: var(--gold); text-decoration: none"
-              title="開啟PDF"
-            >
-              {{ d.filename }} ↗
-            </a>
-          </span>
-          <span>
-            <span class="badge" :class="badgeClass(d.status)">{{ d.status }}</span>
-          </span>
-          <span class="tbl-act">
-            <span class="edit-link" @click="openEdit(d)">編輯</span>
-            <span class="divider">|</span>
-            <button class="btn-del" @click="del(d.id)">刪除</button>
-          </span>
-        </div>
-      </template>
-    </div>
+    <AdminDataTable
+      :columns="columns"
+      :data="data.documents"
+      :loading="!data.loaded"
+      item-label="文檔"
+      count-unit="份"
+      empty-text="尚無文檔，點擊「新增文檔」開始新增"
+    />
 
     <AppDrawer :title="drawerTitle" :visible="visible" :open="open" @close="closeDrawer">
       <div class="fr">
@@ -182,11 +263,35 @@ onMounted(() => {
         ></textarea>
       </div>
       <div class="fr">
-        <label class="lbl">PDF 檔名（存於 Supabase Storage 的 pdfs bucket）</label>
-        <input v-model="form.filename" class="inp" placeholder="例：heart-sutra.pdf" />
-        <div style="font-size: 12px; color: var(--muted); margin-top: 6px">
+        <label class="lbl" for="document-filename">檔名</label>
+        <input
+          id="document-filename"
+          v-model="form.filename"
+          class="inp"
+          name="document-filename"
+          placeholder="例：heart-sutra.pdf"
+        />
+        <div class="document-file-actions">
+          <label
+            class="btn btn-outline btn-sm cursor-pointer"
+            :class="{ 'pointer-events-none opacity-60': uploadingFile }"
+          >
+            {{ uploadingFile ? '上傳中…' : '上傳 PDF / DOCX' }}
+            <input
+              class="hidden"
+              type="file"
+              accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
+              :disabled="uploadingFile"
+              @change="uploadDocumentFile"
+            />
+          </label>
+          <span class="text-xs text-muted">上傳成功後會自動帶入檔名</span>
+        </div>
+        <div class="document-url-preview">
           下載網址將自動變為：<br />
-          <code style="font-size: 11px; color: var(--gold)">{{ urlPreview }}</code>
+          <code :title="urlPreview">
+            {{ urlPreview }}
+          </code>
         </div>
       </div>
       <div class="fr">
@@ -202,3 +307,29 @@ onMounted(() => {
     </AppDrawer>
   </div>
 </template>
+
+<style scoped>
+.document-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.document-url-preview {
+  max-width: 100%;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.document-url-preview code {
+  display: block;
+  max-width: 100%;
+  padding-top: 4px;
+  color: var(--gold);
+  font-size: 11px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+</style>

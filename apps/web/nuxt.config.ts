@@ -1,5 +1,7 @@
 import tailwindcss from '@tailwindcss/vite'
 
+const tailwindPlugin = tailwindcss() as never
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-07-05',
   devtools: { enabled: false },
@@ -7,7 +9,7 @@ export default defineNuxtConfig({
   modules: ['@vercel/analytics/nuxt'],
 
   css: ['~/assets/css/main.css'],
-  vite: { plugins: [tailwindcss()] },
+  vite: { plugins: [tailwindPlugin] },
   build: { transpile: ['@huayuan/shared'] },
 
   // 由環境變數 NUXT_PUBLIC_SUPABASE_URL / NUXT_PUBLIC_SUPABASE_ANON_KEY 注入

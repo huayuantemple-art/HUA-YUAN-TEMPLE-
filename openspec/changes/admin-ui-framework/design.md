@@ -10,11 +10,13 @@
 
 - 導入 Naive UI 並以主題覆蓋套用既有色系,後續新後台頁面可直接使用
 - 收掉 AnnouncementsView 三個 `@todo`(dialog、分頁、date picker)
+- 建立共用 `AdminDataTable` pattern,讓後台資料列表統一 table 樣式與 view 底部分頁
+- 補齊佛法文檔上傳流程,讓管理者可直接上傳 PDF / DOCX 並回填檔名
 - 建立「Naive UI 元件與手刻樣式並存」的漸進模式
 
 **Non-Goals:**
 
-- 不做既有頁面的全面改寫(其他 view 的手刻樣式維持)
+- 不做既有頁面的全面改版;本 change 只收斂已觸碰的列表頁(table/dialog/date picker),其他頁面待各自 change 觸碰時再改
 - 不動前台(apps/web)
 - 不做資料庫 migration(日期欄位維持 text)
 
@@ -36,18 +38,31 @@
 4. **刪除確認用 `useDialog`(而非自製 modal 元件)**
    - Naive UI discrete API 可在既有程式流程(`if (!confirm(...)) return`)中以最小改動換成 async 確認
 
+5. **後台列表抽成 `AdminDataTable`**
+   - 共用 `NDataTable` 欄位渲染、loading/empty 狀態、資料切片與 `NPagination`,避免公告、課程、報名、文檔、帳號各自複製 table/pagination 樣式
+   - 分頁列獨立於 `NDataTable` 內建 pagination,固定在 admin view 底部(`fixed bottom-0`,避開 248px sidebar),確保列表短或長時位置一致
+   - 樣式以 Tailwind utility / arbitrary variants 為主,不再新增 scoped CSS 來覆寫純排版細節;Naive theme token 放在 `theme.ts`
+
+6. **佛法文檔檔案上傳走 Supabase Storage client**
+   - 沿用既有公開 `pdfs` bucket 與 RLS policy;前端使用登入者 session 直接呼叫 `supabase.storage.from(PDF_BUCKET).upload(...)`
+   - 允許 `.pdf` 與 `.docx`,依副檔名設定 content type;上傳成功後只回填 `filename`,資料表仍不存完整 URL
+   - `upsert: true` 允許同名檔案覆蓋,搭配既有 admin insert/update/select storage policies
+
 ## Risks / Trade-offs
 
 - [Naive UI 與手刻樣式視覺不一致] → 嚴格遵循現有 UI style 為驗收條件:theme token 逐項對照既有 CSS 實際值 + 元件層級覆寫補齊;以公告頁為首個範本,改寫前後截圖比對通過才得用於新頁面
 - [bundle 變大] → 逐元件 import + tree-shaking;admin 為登入後才用的 SPA,影響有限
-- [兩套 UI 模式並存的維護心智負擔] → 明文規則:新頁面一律 Naive UI,舊頁面待各自 change 觸碰時再改
+- [兩套 UI 模式並存的維護心智負擔] → 明文規則:新頁面一律 Naive UI + `AdminDataTable`;舊頁面待各自 change 觸碰時再改
 
 ## Migration Plan
 
 1. 安裝 `naive-ui`,App 根組件包 `NConfigProvider` + `NDialogProvider`
 2. 建 `src/lib/theme.ts` 主題覆蓋
-3. AnnouncementsView 依序換 dialog → date picker → NDataTable 分頁
-4. 回滾:revert commits 即可,無 schema/資料變更
+3. 建 `src/components/AdminDataTable.vue`,統一後台列表分頁與 table 外觀
+4. AnnouncementsView 依序換 dialog → date picker → `AdminDataTable`
+5. 課程、報名資料、佛法文檔、帳號管理列表接上 `AdminDataTable`
+6. 佛法文檔表單加入 PDF / DOCX 上傳按鈕與 Storage API 串接
+7. 回滾:revert commits 即可,無 schema/資料變更
 
 ## Open Questions
 

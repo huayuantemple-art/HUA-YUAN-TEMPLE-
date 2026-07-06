@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { h, onMounted, ref, watch } from 'vue'
+import { type DataTableColumns } from 'naive-ui'
+import type { Registration } from '@huayuan/shared'
+import AdminDataTable from '../components/AdminDataTable.vue'
 import { toast } from '../lib/toast'
 import { useDataStore } from '../stores/data'
 
@@ -19,6 +22,44 @@ async function fetchList() {
 
 onMounted(fetchList)
 watch(courseFilter, fetchList)
+
+const columns: DataTableColumns<Registration> = [
+  {
+    title: '姓名',
+    key: 'name',
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: '課程',
+    key: 'course_name',
+    ellipsis: { tooltip: true },
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.course_name || '—'),
+  },
+  {
+    title: '電話',
+    key: 'phone',
+    width: 130,
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.phone || '—'),
+  },
+  {
+    title: 'Email',
+    key: 'email',
+    width: 160,
+    ellipsis: { tooltip: true },
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.email || '—'),
+  },
+  {
+    title: '報名時間',
+    key: 'created_at',
+    width: 110,
+    render: (row) =>
+      h(
+        'span',
+        { class: 'text-xs text-muted' },
+        row.created_at ? row.created_at.slice(0, 10) : '—',
+      ),
+  },
+]
 
 /** 同舊站 exportCSV():UTF-8 BOM(Excel 相容)、同欄位與檔名格式 */
 function exportCSV() {
@@ -51,40 +92,23 @@ function exportCSV() {
 <template>
   <div>
     <div class="row-between">
-      <div style="display: flex; gap: 10px; align-items: center">
-        <select v-model="courseFilter" class="inp" style="width: 220px">
+      <div class="flex items-center gap-[10px]">
+        <select v-model="courseFilter" class="inp w-[220px]">
           <option value="">全部課程</option>
           <option v-for="c in data.courses" :key="c.id" :value="String(c.id)">{{ c.name }}</option>
         </select>
-        <span class="text-muted" style="font-size: 13px"
-          >共 {{ data.registrations.length }} 筆</span
-        >
       </div>
       <button class="btn btn-outline btn-sm" @click="exportCSV">⬇ 匯出 CSV</button>
     </div>
 
-    <div class="card">
-      <div class="th" style="grid-template-columns: 1fr 1fr 130px 160px 110px">
-        <span>姓名</span><span>課程</span><span>電話</span><span>Email</span><span>報名時間</span>
-      </div>
-      <div v-if="loading" class="loading">讀取中…</div>
-      <div v-else-if="!data.registrations.length" class="empty">尚無報名資料</div>
-      <template v-else>
-        <div
-          v-for="r in data.registrations"
-          :key="r.id"
-          class="tr"
-          style="grid-template-columns: 1fr 1fr 130px 160px 110px"
-        >
-          <span>{{ r.name }}</span>
-          <span class="text-muted" style="font-size: 13px">{{ r.course_name || '—' }}</span>
-          <span class="text-muted" style="font-size: 13px">{{ r.phone || '—' }}</span>
-          <span class="text-muted" style="font-size: 13px">{{ r.email || '—' }}</span>
-          <span class="text-muted" style="font-size: 12px">
-            {{ r.created_at ? r.created_at.slice(0, 10) : '—' }}
-          </span>
-        </div>
-      </template>
-    </div>
+    <AdminDataTable
+      :columns="columns"
+      :data="data.registrations"
+      :loading="loading"
+      :reset-key="courseFilter"
+      item-label="報名"
+      count-unit="筆"
+      empty-text="尚無報名資料"
+    />
   </div>
 </template>

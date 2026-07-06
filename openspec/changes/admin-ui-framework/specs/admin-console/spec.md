@@ -26,17 +26,25 @@
 - **WHEN** 管理者點選刪除公告
 - **THEN** 顯示主題化確認對話框,確認後才執行刪除,取消則不動作
 
-### Requirement: 公告列表分頁
+### Requirement: 共用後台列表表格與分頁
 
-公告管理列表 SHALL 支援分頁(NDataTable),搜尋與分類篩選 MUST 與分頁正確組合(篩選後自動回到第一頁)。
+公告、課程、報名資料、佛法文檔、帳號管理等後台資料列表 SHALL 使用共用 table component 實作。該 component MUST 以 Naive UI table 呈現資料,並以固定在 admin view 最下方的分頁列控制資料切片;分頁列 MUST 避開左側 sidebar,且不得覆蓋表格最後一列。
 
 #### Scenario: 公告超過單頁筆數
 - **WHEN** 公告數量超過每頁筆數
 - **THEN** 列表顯示分頁控制,切頁正確顯示對應資料
 
+#### Scenario: 課程與其他列表超過單頁筆數
+- **WHEN** 課程、報名資料、佛法文檔或帳號數量超過每頁筆數
+- **THEN** 列表顯示共用分頁控制,切頁正確顯示對應資料
+
 #### Scenario: 篩選與分頁組合
 - **WHEN** 管理者輸入搜尋或選擇分類篩選
 - **THEN** 結果自動回到第一頁,分頁數依篩選後資料重算
+
+#### Scenario: 分頁固定於 view 底部
+- **WHEN** 列表資料少於或多於一頁,或使用者捲動頁面
+- **THEN** 分頁列維持在 admin 主內容 view 的最下方,且不延伸到左側 sidebar
 
 ### Requirement: 公告日期以日期選擇器輸入
 
@@ -49,3 +57,19 @@
 #### Scenario: 編輯既有公告
 - **WHEN** 管理者編輯既有 `yyyy.MM.dd` 日期的公告
 - **THEN** 日期選擇器正確顯示原日期
+
+### Requirement: 佛法文檔檔案上傳
+
+佛法文檔管理 SHALL 支援管理者上傳 PDF 或 DOCX 檔案至 Supabase Storage。上傳成功後 MUST 自動回填檔名欄位;資料庫 MUST 僅儲存檔名,下載 URL 由 Supabase URL、Storage bucket 與檔名動態組合。
+
+#### Scenario: 上傳 PDF
+- **WHEN** 管理者在佛法文檔表單選擇 `.pdf` 檔案
+- **THEN** 檔案上傳至 Storage,檔名自動回填,下載預覽 URL 正確更新
+
+#### Scenario: 上傳 DOCX
+- **WHEN** 管理者在佛法文檔表單選擇 `.docx` 檔案
+- **THEN** 檔案上傳至 Storage,檔名自動回填,下載預覽 URL 正確更新
+
+#### Scenario: 拒絕非文件格式
+- **WHEN** 管理者選擇非 PDF / DOCX 檔案
+- **THEN** 系統拒絕上傳並提示錯誤

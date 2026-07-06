@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { VideoStatus } from '@huayuan/shared'
+import { useDialog } from 'naive-ui'
+import type { Video, VideoStatus } from '@huayuan/shared'
 import AppDrawer from '../components/AppDrawer.vue'
 import { useDrawer } from '../composables/useDrawer'
 import { api } from '../lib/api'
@@ -10,6 +11,7 @@ import { useDataStore } from '../stores/data'
 
 const data = useDataStore()
 const { visible, open, openDrawer, closeDrawer } = useDrawer()
+const dialog = useDialog()
 
 const form = reactive({
   title: '',
@@ -61,8 +63,22 @@ function inputValue(event: Event): string {
   return (event.target as HTMLInputElement | HTMLSelectElement).value
 }
 
-async function del(id: number) {
-  if (!confirm('確定刪除此影片？')) return
+function del(video: Video) {
+  dialog.warning({
+    title: '確認刪除影片',
+    content: `確定刪除「${video.title}」？此操作無法復原。`,
+    positiveText: '刪除',
+    negativeText: '取消',
+    autoFocus: false,
+    positiveButtonProps: { type: 'error', secondary: true },
+    negativeButtonProps: { secondary: true },
+    async onPositiveClick() {
+      await removeVideo(video.id)
+    },
+  })
+}
+
+async function removeVideo(id: number) {
   try {
     await api.videos.remove(id)
   } catch (error) {
@@ -136,7 +152,7 @@ async function del(id: number) {
             <option :selected="v.status === '已發布'">已發布</option>
             <option :selected="v.status === '草稿'">草稿</option>
           </select>
-          <button class="btn-del" @click="del(v.id)">刪除</button>
+          <button class="btn-del" @click="del(v)">刪除</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { h, onMounted, reactive, ref } from 'vue'
+import { useDialog, type DataTableColumns } from 'naive-ui'
 import type { Course, CourseStatus } from '@huayuan/shared'
+import AdminDataTable from '../components/AdminDataTable.vue'
 import AppDrawer from '../components/AppDrawer.vue'
 import { useDrawer } from '../composables/useDrawer'
 import { api } from '../lib/api'
@@ -12,6 +14,7 @@ import { useUiStore } from '../stores/ui'
 const data = useDataStore()
 const ui = useUiStore()
 const { visible, open, openDrawer, closeDrawer } = useDrawer()
+const dialog = useDialog()
 
 const drawerTitle = ref('新增課程')
 const form = reactive({
@@ -69,8 +72,22 @@ async function save() {
   await data.reloadCourses()
 }
 
-async function del(id: number) {
-  if (!confirm('確定刪除此課程？')) return
+function del(course: Course) {
+  dialog.warning({
+    title: '確認刪除課程',
+    content: `確定刪除「${course.name}」？此操作無法復原。`,
+    positiveText: '刪除',
+    negativeText: '取消',
+    autoFocus: false,
+    positiveButtonProps: { type: 'error', secondary: true },
+    negativeButtonProps: { secondary: true },
+    async onPositiveClick() {
+      await removeCourse(course.id)
+    },
+  })
+}
+
+async function removeCourse(id: number) {
   try {
     await api.courses.remove(id)
   } catch (error) {
@@ -81,6 +98,53 @@ async function del(id: number) {
   toast('已刪除')
 }
 
+const columns: DataTableColumns<Course> = [
+  {
+    title: '課程名稱',
+    key: 'name',
+    ellipsis: { tooltip: true },
+  },
+  {
+    title: '時間',
+    key: 'schedule',
+    width: 130,
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.schedule || '—'),
+  },
+  {
+    title: '程度',
+    key: 'level',
+    width: 80,
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.level || '—'),
+  },
+  {
+    title: '狀態',
+    key: 'status',
+    width: 86,
+    render: (row) => h('span', { class: ['badge', badgeClass(row.status)] }, row.status),
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 110,
+    align: 'right',
+    render: (row) =>
+      h('span', { class: 'inline-flex items-center justify-end gap-[10px] whitespace-nowrap' }, [
+        h(
+          'button',
+          {
+            type: 'button',
+            class:
+              'edit-link appearance-none border-0 bg-transparent p-0 font-[inherit] leading-[inherit]',
+            onClick: () => openEdit(row),
+          },
+          '編輯',
+        ),
+        h('span', { class: 'divider' }, '|'),
+        h('button', { type: 'button', class: 'btn-del', onClick: () => del(row) }, '刪除'),
+      ]),
+  },
+]
+
 onMounted(() => {
   if (ui.consumeDrawer('courses')) setTimeout(openNew, 100)
 })
@@ -89,38 +153,18 @@ onMounted(() => {
 <template>
   <div>
     <div class="row-between">
-      <div class="text-muted" style="font-size: 14px">管理顯示於前台與報名頁的課程</div>
+      <div class="text-muted text-sm">管理顯示於前台與報名頁的課程</div>
       <button class="btn btn-dark" @click="openNew">＋ 新增課程</button>
     </div>
 
-    <div class="card">
-      <div class="th" style="grid-template-columns: 1fr 130px 80px 86px 110px">
-        <span>課程名稱</span><span>時間</span><span>程度</span><span>狀態</span>
-        <span style="text-align: right">操作</span>
-      </div>
-      <div v-if="!data.loaded" class="loading">讀取中…</div>
-      <div v-else-if="!data.courses.length" class="empty">尚無課程</div>
-      <template v-else>
-        <div
-          v-for="c in data.courses"
-          :key="c.id"
-          class="tr"
-          style="grid-template-columns: 1fr 130px 80px 86px 110px"
-        >
-          <span>{{ c.name }}</span>
-          <span class="text-muted" style="font-size: 13px">{{ c.schedule || '—' }}</span>
-          <span class="text-muted" style="font-size: 13px">{{ c.level || '—' }}</span>
-          <span>
-            <span class="badge" :class="badgeClass(c.status)">{{ c.status }}</span>
-          </span>
-          <span class="tbl-act">
-            <span class="edit-link" @click="openEdit(c)">編輯</span>
-            <span class="divider">|</span>
-            <button class="btn-del" @click="del(c.id)">刪除</button>
-          </span>
-        </div>
-      </template>
-    </div>
+    <AdminDataTable
+      :columns="columns"
+      :data="data.courses"
+      :loading="!data.loaded"
+      item-label="課程"
+      count-unit="門"
+      empty-text="尚無課程"
+    />
 
     <AppDrawer :title="drawerTitle" :visible="visible" :open="open" @close="closeDrawer">
       <div class="fr">
