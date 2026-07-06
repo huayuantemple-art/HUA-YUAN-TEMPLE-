@@ -1,3 +1,88 @@
+<script setup lang="ts">
+import {
+  DHARMA_GROUP_LABELS,
+  escapeHtml,
+  type DharmaGroupKey,
+  type DharmaSection,
+} from '@huayuan/shared'
+
+/** 章節為固定枚舉:錨點、圓形圖示與標題樣式綁章節(dharma-cms design 決策 2) */
+const GROUP_META: Array<{ key: DharmaGroupKey; anchor: string; icon: string }> = [
+  { key: 'intro', anchor: 'd-intro', icon: '' },
+  { key: 'sanjie', anchor: 'd-sanjie', icon: '皈' },
+  { key: 'wujie', anchor: 'd-wujie', icon: '戒' },
+  { key: 'sanxue', anchor: 'd-sanxue', icon: '學' },
+]
+
+const api = useApi()
+const { data: sections } = await useAsyncData('dharma-sections', () =>
+  api.dharmaSections.listPublished(),
+)
+
+interface Entry {
+  title: string
+  desc: string
+}
+
+type Block =
+  | { kind: 'text'; html: string }
+  | { kind: 'grid'; entries: Entry[] }
+  | { kind: 'items'; entries: Entry[] }
+
+/** 逐行 escapeHtml 後以 <br /> 相連;行首「＊」呈現為粗體強調 */
+function linesToHtml(text: string): string {
+  return text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) =>
+      line.startsWith('＊') ? `<strong>${escapeHtml(line.slice(1))}</strong>` : escapeHtml(line),
+    )
+    .join('<br />')
+}
+
+/**
+ * 純文字行內慣例 → 版面區塊(慣例定義見 seed migration 檔頭):
+ * 「標題｜說明」行為條列項,①②… 開頭者排成雙欄格線;其餘行合併為段落
+ */
+function parseBlocks(content: string): Block[] {
+  const blocks: Block[] = []
+  const textLines: string[] = []
+  const flushText = () => {
+    if (!textLines.length) return
+    blocks.push({ kind: 'text', html: linesToHtml(textLines.join('\n')) })
+    textLines.length = 0
+  }
+  for (const line of content.split('\n').map((l) => l.trim()).filter(Boolean)) {
+    const sep = line.indexOf('｜')
+    if (sep > 0) {
+      flushText()
+      const entry = { title: line.slice(0, sep).trim(), desc: line.slice(sep + 1).trim() }
+      const kind = /^[①-⑳]/.test(entry.title) ? 'grid' : 'items'
+      const last = blocks[blocks.length - 1]
+      if (last && last.kind !== 'text' && last.kind === kind) last.entries.push(entry)
+      else blocks.push({ kind, entries: [entry] })
+    } else {
+      textLines.push(line)
+    }
+  }
+  flushText()
+  return blocks
+}
+
+const groups = computed(() => {
+  const rows: DharmaSection[] = sections.value ?? []
+  return GROUP_META.map((meta) => ({
+    ...meta,
+    label: DHARMA_GROUP_LABELS[meta.key],
+    rows: rows
+      .filter((row) => row.group_key === meta.key)
+      .sort((a, b) => a.seq - b.seq)
+      .map((row) => ({ ...row, blocks: parseBlocks(row.content) })),
+  })).filter((group) => group.rows.length > 0)
+})
+</script>
+
 <template>
   <div>
     <div
@@ -35,305 +120,139 @@
         初入佛門綱要 · 護持正法
       </p>
     </div>
-    <div class="sutra-nav">
+    <div v-if="groups.length" class="sutra-nav">
       <div class="sutra-nav-inner">
-        <a href="#d-intro" class="active">序經</a>
-        <a href="#d-sanjie">三皈依</a>
-        <a href="#d-wujie">五戒</a>
-        <a href="#d-sanxue">三學</a>
+        <a
+          v-for="(group, gi) in groups"
+          :key="group.key"
+          :href="`#${group.anchor}`"
+          :class="{ active: gi === 0 }"
+          >{{ group.label }}</a
+        >
       </div>
     </div>
     <div class="sutra-content-wrap" style="max-width: 860px; margin: 0 auto; padding: 60px 40px 80px">
-      <div id="d-intro" class="sutra-quote">
-        <div
-          style="
-            font-family: 'Noto Serif TC', serif;
-            font-size: 12px;
-            color: #b8893a;
-            letter-spacing: 0.4em;
-            margin-bottom: 20px;
-            text-align: center;
-          "
-        >
-          序 · 經文
-        </div>
-        <div
-          style="
-            font-size: 13px;
-            color: #b8893a;
-            letter-spacing: 0.2em;
-            margin-bottom: 14px;
-            text-align: center;
-          "
-        >
-          《佛說三歸五戒慈心厭離功德經》
-        </div>
-        <p
-          style="
-            font-family: 'Noto Serif TC', serif;
-            font-size: 17px;
-            line-height: 2.6;
-            color: #2a1a16;
-            margin: 0;
-            letter-spacing: 0.04em;
-            text-align: justify;
-          "
-        >
-          如上施福，不如受三自歸。受三歸者，施一切眾生無畏。是故歸佛、法、僧，其福不可計量也。如上布施及受三歸福，復不如受五戒福。受五戒者，功德滿具，其福勝也。
-        </p>
-      </div>
-      <div id="d-sanjie" class="sutra-section">
-        <div class="sutra-section-head">
-          <div class="sutra-icon">皈</div>
-          <h2
+      <template v-for="group in groups" :key="group.key">
+        <div v-if="group.key === 'intro'" :id="group.anchor" class="sutra-quote">
+          <div
             style="
               font-family: 'Noto Serif TC', serif;
-              font-size: 28px;
-              color: #3a211c;
-              margin: 0;
-              letter-spacing: 0.16em;
+              font-size: 12px;
+              color: #b8893a;
+              letter-spacing: 0.4em;
+              margin-bottom: 20px;
+              text-align: center;
             "
           >
-            三皈依
-          </h2>
-        </div>
-        <div class="sutra-card">
-          <div class="sutra-subtitle">一、釋名</div>
-          <p class="sutra-text">
-            ㈠ 皈者歸投，依者依靠。<br />㈡ 皈依者係皈依三寶。三寶者佛、法、僧也。
-          </p>
-          <div class="sutra-divider"></div>
-          <div class="sutra-subtitle">二、稱「寶」六義</div>
-          <div class="sutra-inline-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px">
+            序 · 經文
+          </div>
+          <template v-for="row in group.rows" :key="row.id">
             <div
+              v-if="row.title"
               style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
+                font-size: 13px;
+                color: #b8893a;
+                letter-spacing: 0.2em;
+                margin-bottom: 14px;
+                text-align: center;
               "
             >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ① 希有曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶貧窮所無，三寶薄福不遇。
-              </div>
+              {{ row.title }}
             </div>
-            <div
+            <!-- eslint-disable vue/no-v-html -- linesToHtml 已逐行 escapeHtml,僅插入受控 <br>/<strong> -->
+            <p
               style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
+                font-family: 'Noto Serif TC', serif;
+                font-size: 17px;
+                line-height: 2.6;
+                color: #2a1a16;
+                margin: 0;
+                letter-spacing: 0.04em;
+                text-align: justify;
+              "
+              v-html="linesToHtml(row.content)"
+            ></p>
+          </template>
+        </div>
+        <div v-else :id="group.anchor" class="sutra-section">
+          <div class="sutra-section-head">
+            <div class="sutra-icon">{{ group.icon }}</div>
+            <h2
+              style="
+                font-family: 'Noto Serif TC', serif;
+                font-size: 28px;
+                color: #3a211c;
+                margin: 0;
+                letter-spacing: 0.16em;
               "
             >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ② 離垢曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶體無瑕穢，三寶絕離諸漏。
-              </div>
-            </div>
-            <div
-              style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
-              "
-            >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ③ 勢力曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶除貧去毒，三寶六通難思。
-              </div>
-            </div>
-            <div
-              style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
-              "
-            >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ④ 莊嚴曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶嚴身令好，三寶能嚴法身。
-              </div>
-            </div>
-            <div
-              style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
-              "
-            >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ⑤ 最勝曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶諸物中勝，三寶諸有無上。
-              </div>
-            </div>
-            <div
-              style="
-                padding: 10px 14px;
-                background: rgba(201, 162, 75, 0.05);
-                border: 1px solid rgba(201, 162, 75, 0.2);
-              "
-            >
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 14px;
-                  color: #3a211c;
-                  margin-bottom: 3px;
-                "
-              >
-                ⑥ 不改曰寶
-              </div>
-              <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
-                世寶鍊磨不變，三寶八法不動。
-              </div>
-            </div>
+              {{ group.label }}
+            </h2>
           </div>
-          <div class="sutra-divider"></div>
-          <div class="sutra-subtitle">三、三寶義</div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈠ 佛義</div>
-            <p class="sutra-item-desc">
-              佛名覺者，覺有三：自覺、覺他、覺滿。無師大智及無學地一切功德是名佛寶。
-            </p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈡ 法義</div>
-            <p class="sutra-item-desc">軌則名法，能生物解。滅諦無為是名法寶。</p>
-          </div>
-          <div class="sutra-item" style="margin-bottom: 22px">
-            <div class="sutra-item-title">㈢ 僧義</div>
-            <p class="sutra-item-desc">聲聞學、無學功德智慧，是名僧寶。</p>
-          </div>
-          <div class="sutra-box">皈依三寶後，應常念佛、念法、念僧，求生極樂世界。</div>
-        </div>
-      </div>
-      <div id="d-wujie" class="sutra-section">
-        <div class="sutra-section-head">
-          <div class="sutra-icon">戒</div>
-          <h2
-            style="
-              font-family: 'Noto Serif TC', serif;
-              font-size: 28px;
-              color: #3a211c;
-              margin: 0;
-              letter-spacing: 0.16em;
-            "
-          >
-            五戒
-          </h2>
-        </div>
-        <div class="sutra-card">
-          <div class="sutra-subtitle">一、釋名</div>
-          <p class="sutra-text">
-            五戒者，所謂不殺、不盜、不邪婬、不妄語、不飲酒是。此五能防故名為戒。
-          </p>
-          <div class="sutra-divider"></div>
-          <div class="sutra-subtitle">二、分別解說</div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈠ 不殺生</div>
-            <p class="sutra-item-desc">慈悲護生，不斷有情命。</p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈡ 不盜</div>
-            <p class="sutra-item-desc">非理損者為盜。下至草葉不盜。</p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈢ 不邪婬</div>
-            <p class="sutra-item-desc">護持清淨梵行。</p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">㈣ 不妄語</div>
-            <p class="sutra-item-desc">口四過皆須遠離：妄語、惡口、兩舌、綺語。</p>
-          </div>
-          <div class="sutra-item" style="margin-bottom: 22px">
-            <div class="sutra-item-title">㈤ 不飲酒</div>
-            <p class="sutra-item-desc">酒能亂性，失諸善法。</p>
-          </div>
-          <div class="sutra-box">受五戒者，以此善根，迴向願求生於西方極樂世界。</div>
-        </div>
-      </div>
-      <div id="d-sanxue" class="sutra-section">
-        <div class="sutra-section-head">
-          <div class="sutra-icon">學</div>
-          <h2
-            style="
-              font-family: 'Noto Serif TC', serif;
-              font-size: 28px;
-              color: #3a211c;
-              margin: 0;
-              letter-spacing: 0.16em;
-            "
-          >
-            三學
-          </h2>
-        </div>
-        <div class="sutra-card">
-          <div class="sutra-subtitle">一、釋名與次第</div>
-          <p class="sutra-text">
-            三學：增戒學、增定學、增慧學。聖教雖多，不越三學。<br /><strong
-              >戒如捉賊，定縛，慧殺。</strong
-            >
-          </p>
-          <div class="sutra-divider"></div>
-          <div class="sutra-subtitle">二、分別解說</div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">戒學　防非止惡</div>
-            <p class="sutra-item-desc">「五分功德，以戒為初；無上菩提，以戒為本。」</p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">定學　澄心靜慮</div>
-            <p class="sutra-item-desc">四禪次第修習，澄澈心源。</p>
-          </div>
-          <div class="sutra-item">
-            <div class="sutra-item-title">慧學　照破無明</div>
-            <p class="sutra-item-desc">依定發慧，如實了知諸法實相。</p>
+          <div class="sutra-card">
+            <template v-for="(row, ri) in group.rows" :key="row.id">
+              <div v-if="row.title && ri > 0" class="sutra-divider"></div>
+              <!-- title 為 null → 置中經句框 -->
+              <!-- eslint-disable-next-line vue/no-v-html -- linesToHtml 已逐行 escapeHtml -->
+              <div v-if="!row.title" class="sutra-box" v-html="linesToHtml(row.content)"></div>
+              <template v-else>
+                <div class="sutra-subtitle">{{ row.title }}</div>
+                <template v-for="(block, bi) in row.blocks" :key="bi">
+                  <!-- eslint-disable-next-line vue/no-v-html -- block.html 由 linesToHtml 產生,已逐行 escapeHtml -->
+                  <p v-if="block.kind === 'text'" class="sutra-text" v-html="block.html"></p>
+                  <div
+                    v-else-if="block.kind === 'grid'"
+                    class="sutra-inline-grid"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px"
+                  >
+                    <div
+                      v-for="entry in block.entries"
+                      :key="entry.title"
+                      style="
+                        padding: 10px 14px;
+                        background: rgba(201, 162, 75, 0.05);
+                        border: 1px solid rgba(201, 162, 75, 0.2);
+                      "
+                    >
+                      <div
+                        style="
+                          font-family: 'Noto Serif TC', serif;
+                          font-size: 14px;
+                          color: #3a211c;
+                          margin-bottom: 3px;
+                        "
+                      >
+                        {{ entry.title }}
+                      </div>
+                      <div style="font-size: 12px; color: #8a6f55; line-height: 1.8">
+                        {{ entry.desc }}
+                      </div>
+                    </div>
+                  </div>
+                  <template v-else>
+                    <div
+                      v-for="(entry, ei) in block.entries"
+                      :key="entry.title"
+                      class="sutra-item"
+                      :style="
+                        ei === block.entries.length - 1 && ri < group.rows.length - 1
+                          ? { marginBottom: '22px' }
+                          : undefined
+                      "
+                    >
+                      <div class="sutra-item-title">{{ entry.title }}</div>
+                      <p class="sutra-item-desc">{{ entry.desc }}</p>
+                    </div>
+                  </template>
+                </template>
+              </template>
+            </template>
           </div>
         </div>
-      </div>
+      </template>
+      <p v-if="!groups.length" class="sutra-text" style="text-align: center">
+        法要內容整理中，敬請期待。
+      </p>
     </div>
   </div>
 </template>
