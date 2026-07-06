@@ -22,5 +22,5 @@
 ## 4. 驗證
 
 - [x] 4.1 `pnpm lint && pnpm typecheck && pnpm test && pnpm build:web && pnpm build:admin` 通過
-- [ ] 4.2 RLS:匿名讀草稿經文為空、寫入被拒
+- [x] 4.2 RLS:匿名讀草稿經文為空、寫入被拒
 - [ ] 4.3 端到端:後台編輯/排序/上下架 → 前台列表與閱讀頁正確反映;`/sutra` 舊路徑呈現心經

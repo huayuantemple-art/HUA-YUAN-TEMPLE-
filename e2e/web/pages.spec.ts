@@ -33,3 +33,16 @@ test('ISR/SSR:原始 HTML 即含資料庫內容(SEO 可索引)', async ({ reques
   // 課程名稱由 Supabase 提供;出現在未執行 JS 的原始 HTML 才算 SSR 成功
   expect(html).toContain('研讀班')
 })
+
+test('經文庫:法寶略節列表、動態閱讀頁與舊 /sutra 心經路徑正確', async ({ page }) => {
+  await page.goto('/primer')
+  await expect(page.locator('a[href="/sutra/1"]')).toContainText('大般若波羅蜜多經卷第五百七十四')
+
+  await page.goto('/sutra/1')
+  await expect(page.locator('h1')).toContainText('大般若波羅蜜多經卷第五百七十四')
+  await expect(page.locator('body')).toContainText('第七曼殊室利分之一')
+
+  await page.goto('/sutra')
+  await expect(page.locator('h1')).toContainText('般若波羅蜜多心經')
+  await expect(page.locator('body')).toContainText('觀自在菩薩')
+})
