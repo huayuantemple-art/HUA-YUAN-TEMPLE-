@@ -45,38 +45,6 @@ function documentDownloadUrl(name: string, filename: string): string {
           margin-bottom: 8px;
         "
       >
-        佛法文檔下載
-      </div>
-      <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
-      <div>
-        <div v-if="docsPending" class="loading">讀取中…</div>
-        <template v-else-if="list.length">
-          <div v-for="d in list" :key="d.id" class="doc-item fadein">
-            <div class="doc-icon">▤</div>
-            <div class="doc-info">
-              <div class="doc-name">{{ d.name }}</div>
-              <div class="doc-desc">{{ d.description || '' }}</div>
-            </div>
-            <a
-              class="doc-dl"
-              :href="documentDownloadUrl(d.name, d.filename)"
-              >下載 {{ documentExtension(d.filename) }} ↓</a
-            >
-          </div>
-        </template>
-        <div v-else class="empty-msg">目前尚無文檔，敬請期待。</div>
-      </div>
-
-      <div
-        style="
-          margin-top: 52px;
-          font-family: 'Noto Serif TC', serif;
-          font-size: 24px;
-          color: #3a211c;
-          letter-spacing: 0.1em;
-          margin-bottom: 8px;
-        "
-      >
         線上閱讀
       </div>
       <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
@@ -138,6 +106,38 @@ function documentDownloadUrl(name: string, filename: string): string {
         </NuxtLink>
       </div>
       <div v-else class="empty-msg">目前尚無經文，敬請期待。</div>
+
+      <div
+        style="
+          margin-top: 52px;
+          font-family: 'Noto Serif TC', serif;
+          font-size: 24px;
+          color: #3a211c;
+          letter-spacing: 0.1em;
+          margin-bottom: 8px;
+        "
+      >
+        佛法文檔下載
+      </div>
+      <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
+      <div>
+        <div v-if="docsPending" class="loading">讀取中…</div>
+        <template v-else-if="list.length">
+          <div v-for="d in list" :key="d.id" class="doc-item fadein">
+            <div class="doc-icon">▤</div>
+            <div class="doc-info">
+              <div class="doc-name">{{ d.name }}</div>
+              <div class="doc-desc">{{ d.description || '' }}</div>
+            </div>
+            <a
+              class="doc-dl"
+              :href="documentDownloadUrl(d.name, d.filename)"
+              >下載 {{ documentExtension(d.filename) }} ↓</a
+            >
+          </div>
+        </template>
+        <div v-else class="empty-msg">目前尚無文檔，敬請期待。</div>
+      </div>
     </div>
   </div>
 </template>
