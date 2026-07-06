@@ -54,6 +54,9 @@ for t in about contact; do
   check "UPDATE ${t} 無任何列被改(空集合)" "$(req PATCH "$t?id=eq.1" '{"headline":"pwn","address":"pwn"}' )" '^(2..\|\[\]|4)'
   check "DELETE ${t} 無任何列被刪(空集合)" "$(req DELETE "$t?id=eq.1")" '^(2..\|\[\]|4)'
 done
+check "INSERT site_content 被拒(401/403)"        "$(req POST  "site_content" '{"key":"pwn","value":"pwn"}')" '^40[13]'
+check "UPDATE site_content 無任何列被改(空集合)" "$(req PATCH "site_content?key=neq." '{"value":"pwned"}')" '^(2..\|\[\]|4)'
+check "DELETE site_content 無任何列被刪(空集合)" "$(req DELETE "site_content?key=neq.")" '^(2..\|\[\]|4)'
 check "UPDATE registrations 無任何列被改" "$(req PATCH "registrations?id=gt.0" '{"name":"pwn"}')" '^(2..\|\[\]|4)'
 check "DELETE registrations 無任何列被刪" "$(req DELETE "registrations?id=gt.0")" '^(2..\|\[\]|4)'
 
@@ -67,6 +70,7 @@ check "SELECT about"                     "$(req GET "about?select=id")" '^200\|'
 check "SELECT contact"                   "$(req GET "contact?select=id")" '^200\|'
 check "SELECT dharma_sections(已發布可讀)" "$(req GET "dharma_sections?select=id&limit=1")" '^200\|'
 check "SELECT dharma_sections 草稿回空集合" "$(req GET "dharma_sections?select=id&status=eq.%E8%8D%89%E7%A8%BF")" '^200\|\[\]$'
+check "SELECT site_content(文案公開可讀)" "$(req GET "site_content?select=key&limit=1")" '^200\|'
 
 echo "== 匿名報名(INSERT registrations)仍正常 =="
 check "INSERT registrations 成功(201,return=minimal 同 signup-form 行為)" "$(req POST "registrations" '{"name":"__RLS_TEST__","phone":"000"}' 'return=minimal')" '^201'

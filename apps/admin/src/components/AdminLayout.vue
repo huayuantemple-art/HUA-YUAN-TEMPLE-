@@ -23,6 +23,7 @@ const NAV_CONTENT = [
 ] as const
 
 const NAV_SETTINGS = [
+  { name: 'site-copy', icon: '✎', label: '網站文案' },
   { name: 'about', icon: '⌂', label: '關於我們' },
   { name: 'contact', icon: '⌖', label: '聯絡與交通' },
 ] as const

@@ -18,6 +18,6 @@
 
 ## 4. 驗證
 
-- [ ] 4.1 `pnpm lint && pnpm typecheck && pnpm test && pnpm build:web && pnpm build:admin` 通過
+- [x] 4.1 `pnpm lint && pnpm typecheck && pnpm test && pnpm build:web && pnpm build:admin` 通過
 - [ ] 4.2 RLS:匿名讀草稿為空、寫入被拒
 - [ ] 4.3 端到端:後台增修小節與排序 → 前台正確反映;空表情境確認頁面不致錯誤(顯示空狀態)

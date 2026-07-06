@@ -61,6 +61,12 @@ export const router = createRouter({
           meta: { title: '法要管理' },
         },
         {
+          path: 'site-copy',
+          name: 'site-copy',
+          component: () => import('../views/SiteCopyView.vue'),
+          meta: { title: '網站文案' },
+        },
+        {
           path: 'about',
           name: 'about',
           component: () => import('../views/AboutView.vue'),
