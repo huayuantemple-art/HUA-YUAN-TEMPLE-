@@ -10,6 +10,7 @@ export {
 } from './api/http'
 export { createApi, type Api, type ApiOptions } from './api/repositories'
 export { escapeHtml, resolveMapEmbedSrc, MAP_EMBED_WHITELIST } from './sanitize'
+export { parseAnnouncementDate, type AnnouncementDateParts } from './announcementDate'
 export {
   SITE_COPY,
   SITE_COPY_GROUPS,

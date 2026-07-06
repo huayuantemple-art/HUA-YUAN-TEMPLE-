@@ -15,12 +15,6 @@ const list = computed(() =>
     ? (ann.value ?? [])
     : (ann.value ?? []).filter((n) => n.tag === activeFilter.value),
 )
-
-// 同舊站:date 以 '.' 拆為 日 / 年.月
-function dateParts(date: string | null) {
-  const parts = (date || '').split('.')
-  return { day: parts[2] || '', ym: parts.slice(0, 2).join('.') }
-}
 </script>
 
 <template>
@@ -64,61 +58,8 @@ function dateParts(date: string | null) {
           {{ f }}
         </button>
       </div>
-      <div>
-        <div v-if="pending" class="loading">讀取中…</div>
-        <template v-else-if="list.length">
-          <div
-            v-for="n in list"
-            :key="n.id"
-            class="news-list-item fadein"
-            style="
-              display: flex;
-              gap: 28px;
-              padding: 26px 4px;
-              border-bottom: 1px solid rgba(201, 162, 75, 0.25);
-              align-items: flex-start;
-            "
-          >
-            <div class="news-list-date" style="flex-shrink: 0; width: 100px; text-align: center">
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 22px;
-                  color: #3a211c;
-                  line-height: 1.1;
-                "
-              >
-                {{ dateParts(n.date).day }}
-              </div>
-              <div style="font-size: 12px; color: #b8893a; letter-spacing: 0.1em; margin-top: 2px">
-                {{ dateParts(n.date).ym }}
-              </div>
-            </div>
-            <div class="news-list-tag" style="flex-shrink: 0; padding-top: 3px">
-              <span
-                style="font-size: 12px; padding: 4px 12px; background: #3a211c; color: #c9a24b"
-                >{{ n.tag }}</span
-              >
-            </div>
-            <div class="news-list-body" style="flex: 1">
-              <div
-                style="
-                  font-family: 'Noto Serif TC', serif;
-                  font-size: 19px;
-                  color: #2a1a16;
-                  margin-bottom: 7px;
-                "
-              >
-                {{ n.title }}
-              </div>
-              <p style="font-size: 14px; color: #8a6f55; line-height: 1.9; margin: 0">
-                {{ n.content || '' }}
-              </p>
-            </div>
-          </div>
-        </template>
-        <div v-else class="empty-msg">此分類目前尚無公告。</div>
-      </div>
+      <div v-if="pending" class="loading">讀取中…</div>
+      <NewsCalendar v-else :announcements="list" />
     </div>
   </div>
 </template>
