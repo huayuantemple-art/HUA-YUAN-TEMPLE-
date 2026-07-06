@@ -12,6 +12,7 @@ import type {
   Sutra,
   Video,
 } from '../types'
+import type { SiteContent } from '../siteCopy'
 
 /** 泛用 CRUD(PostgREST 語法),各表 repository 據此組成 */
 function tableRepo<Row extends { id: number }>(http: AxiosInstance, table: string) {
@@ -139,6 +140,27 @@ export function createApi(options: ApiOptions) {
     },
     about: singletonRepo<About>(http, 'about'),
     contact: singletonRepo<Contact>(http, 'contact'),
+    siteContent: {
+      /** 前後台共用:一次撈全部文案(量小,前台據以 getCopy fallback) */
+      async list(): Promise<SiteContent[]> {
+        const { data } = await http.get<SiteContent[]>('/site_content', {
+          params: { select: '*' },
+        })
+        return data
+      },
+      /** 後台:以 key 為衝突鍵 upsert 單一文案(RLS 授予 admin insert+update) */
+      async upsert(key: string, value: string): Promise<SiteContent | null> {
+        const { data } = await http.post<SiteContent[]>(
+          '/site_content',
+          { key, value, updated_at: new Date().toISOString() },
+          {
+            params: { on_conflict: 'key' },
+            headers: { Prefer: 'return=representation,resolution=merge-duplicates' },
+          },
+        )
+        return data[0] ?? null
+      },
+    },
     registrations: {
       /** 後台:檢視/匯出(RLS 僅 admin 可讀);可帶 PostgREST 條件如 course_id=eq.N */
       listAll: (params: Record<string, string> = {}) =>
