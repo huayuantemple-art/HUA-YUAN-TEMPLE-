@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const api = useApi()
+const { copy } = useSiteCopy()
 const { data: courses, pending } = useLazyAsyncData('courses', () => api.courses.listPublic())
 const list = computed(() => courses.value ?? [])
 </script>
@@ -61,10 +62,10 @@ const list = computed(() => courses.value ?? [])
             margin-bottom: 12px;
           "
         >
-          線上報名表單
+          {{ copy('course_form_title') }}
         </div>
         <p style="font-size: 14px; color: #8a6f55; margin-bottom: 20px">
-          選擇課程後填寫個人資料，我們將於三個工作天內與您聯繫確認
+          {{ copy('course_form_note') }}
         </p>
         <NuxtLink to="/signup" class="btn-gold">前往報名 →</NuxtLink>
       </div>
