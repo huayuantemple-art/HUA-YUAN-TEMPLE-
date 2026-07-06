@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const api = useApi()
+const { copy, copyHtml } = useSiteCopy()
 const { data: ann, pending: annPending } = useLazyAsyncData('announcements', () =>
   api.announcements.listPublished(),
 )
@@ -32,14 +33,13 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           class="hero-kicker-line"
           style="width: 50px; height: 1px; background: #c9a24b"
         ></span>
+        <!-- eslint-disable vue/no-v-html -- copyHtml 已 escapeHtml,僅換行轉受控 <br> -->
         <span
           class="hero-kicker-text"
           style="font-size: 13px; letter-spacing: 0.4em; color: #c9a24b"
-          >諸佛唯一大事因緣出現於世
-          <br />
-          開佛知見 示佛知見 悟佛知見 入佛知見
-        </span
-        >
+          v-html="copyHtml('home_hero_kicker')"
+        ></span>
+        <!-- eslint-enable vue/no-v-html -->
 
         <span
           class="hero-kicker-line"
@@ -57,8 +57,9 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           letter-spacing: 0.08em;
         "
       >
-        佛身真金色 圓光遍一尋
+        {{ copy('home_hero_title') }}
       </h1>
+      <!-- eslint-disable vue/no-v-html -- copyHtml 已 escapeHtml,僅換行轉受控 <br> -->
       <p
         class="hero-verse"
         style="
@@ -68,11 +69,9 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           max-width: 580px;
           margin: 0 auto 40px;
         "
-      >
-        永斷眾煩惱 超度生死流 如是大導師 能調伏一切
-        <br />
-        眾生咸蒙化 故號為真濟 汝今宜速往 詣彼世尊所
-      </p>
+        v-html="copyHtml('home_hero_verse')"
+      ></p>
+      <!-- eslint-enable vue/no-v-html -->
       <div class="hero-btns" style="display: flex; gap: 16px; justify-content: center">
         <button class="btn-gold" @click="navigateTo('/course')">立即報名課程</button>
         <button
@@ -123,20 +122,20 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
         <div class="grid3">
           <NuxtLink class="dharma-card" to="/dharma">
             <div class="dharma-num">壹</div>
-            <div class="dharma-name">入佛門法要</div>
-            <p class="dharma-desc">三皈依、五戒、三學，初入佛門之綱要。</p>
+            <div class="dharma-name">{{ copy('home_primer_card1_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card1_desc') }}</p>
             <div class="dharma-more">線上閱讀 →</div>
           </NuxtLink>
           <NuxtLink class="dharma-card" to="/sutra">
             <div class="dharma-num">貳</div>
-            <div class="dharma-name">般若波羅蜜多心經</div>
-            <p class="dharma-desc">二百六十字攝盡般若精要，照見五蘊皆空。</p>
+            <div class="dharma-name">{{ copy('home_primer_card2_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card2_desc') }}</p>
             <div class="dharma-more">閱讀經文 →</div>
           </NuxtLink>
           <NuxtLink class="dharma-card" to="/primer">
             <div class="dharma-num">參</div>
-            <div class="dharma-name">佛法文檔下載</div>
-            <p class="dharma-desc">提供 PDF 經文供信眾下載研讀。</p>
+            <div class="dharma-name">{{ copy('home_primer_card3_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card3_desc') }}</p>
             <div class="dharma-more">前往下載 →</div>
           </NuxtLink>
         </div>
