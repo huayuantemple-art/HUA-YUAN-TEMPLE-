@@ -846,10 +846,79 @@ iframe {
   margin-bottom: 36px;
 }
 
-/* ABOUT values */
+/* ABOUT */
+.about-intro {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 76px 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 56px;
+  align-items: center;
+}
+.about-copy-panel {
+  min-width: 0;
+  padding: 10px 0;
+}
+.about-section-kicker {
+  margin-bottom: 14px;
+}
+.about-headline {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 1.55;
+  letter-spacing: 0.08em;
+  color: #3a211c;
+  margin: 0 0 24px;
+}
+.about-copy {
+  max-width: 620px;
+  color: #6b5a48;
+  font-size: 15px;
+  line-height: 2.15;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+.about-photo {
+  width: 100%;
+  aspect-ratio: 5/4;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e7dcc4;
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  color: #9d8454;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+}
+.about-values {
+  padding: 68px 40px 76px;
+  background: #3a211c;
+  color: #f7efd9;
+}
+.about-values-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+.about-values-kicker {
+  margin-bottom: 34px;
+  color: #c9a24b;
+  font-size: 12px;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
 .value-item {
   text-align: center;
-  padding: 0 10px;
+  padding: 28px 24px 30px;
+  border: 1px solid rgba(201, 162, 75, 0.25);
+  background: rgba(255, 253, 248, 0.04);
 }
 .value-char {
   font-family: 'Noto Serif TC', serif;
@@ -970,8 +1039,8 @@ iframe {
     grid-template-columns: 1fr !important;
     gap: 36px !important;
   }
-  .about-intro > div {
-    min-width: 0;
+  .about-values-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1030,58 +1099,45 @@ iframe {
     font-size: 30px;
     letter-spacing: 0.1em;
   }
-  .about-banner {
-    background: #fffdf8;
-    color: #101010;
-    padding: 44px 20px 58px;
-  }
-  .about-banner .banner-en {
-    display: none;
-  }
   .about-banner h1 {
-    color: #101010;
-    font-size: 38px;
+    font-size: 32px;
     font-weight: 500;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     line-height: 1.45;
   }
   .about-banner p {
-    color: #101010;
-    font-family: 'Noto Serif TC', serif;
-    font-size: 22px;
-    letter-spacing: 0.08em;
-    line-height: 2.25;
-    margin-top: 26px;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    line-height: 2;
+    margin-top: 18px;
   }
   .about-intro {
-    padding: 0 20px 58px !important;
-  }
-  .about-photo {
-    display: none !important;
+    padding: 54px 20px 58px !important;
   }
   .about-section-kicker {
-    color: #101010;
-    font-family: 'Noto Serif TC', serif;
-    font-size: 34px;
-    letter-spacing: 0.08em;
-    line-height: 1.65;
-    margin-bottom: 28px !important;
-    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    margin-bottom: 12px !important;
+    text-align: left;
   }
   .about-headline {
-    color: #101010 !important;
-    font-size: 28px !important;
-    letter-spacing: 0.12em !important;
-    line-height: 1.9 !important;
-    margin-bottom: 28px !important;
-    text-align: center;
+    color: #3a211c !important;
+    font-size: 27px !important;
+    letter-spacing: 0.08em !important;
+    line-height: 1.65 !important;
+    margin-bottom: 22px !important;
+    text-align: left;
   }
   .about-copy {
-    color: #101010 !important;
-    font-family: 'Noto Serif TC', serif;
-    font-size: 20px !important;
-    letter-spacing: 0.06em;
-    line-height: 2.8 !important;
+    color: #6b5a48 !important;
+    font-size: 16px !important;
+    line-height: 2.25 !important;
+  }
+  .about-photo {
+    aspect-ratio: 4/3;
+  }
+  .about-values {
+    padding: 54px 20px 60px;
   }
   .grid3,
   .grid2 {
@@ -1324,27 +1380,27 @@ iframe {
     letter-spacing: 0.22em;
   }
   .about-banner {
-    padding: 40px 16px 52px;
+    padding: 46px 16px 44px;
   }
   .about-banner h1 {
-    font-size: 34px;
+    font-size: 30px;
   }
   .about-banner p {
-    font-size: 20px;
+    font-size: 14px;
   }
   .about-intro {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
   .about-section-kicker {
-    font-size: 30px;
+    letter-spacing: 0.24em;
   }
   .about-headline {
     font-size: 25px !important;
   }
   .about-copy {
-    font-size: 18px !important;
-    line-height: 2.75 !important;
+    font-size: 15px !important;
+    line-height: 2.2 !important;
   }
   .hero-pad {
     padding-left: 16px !important;

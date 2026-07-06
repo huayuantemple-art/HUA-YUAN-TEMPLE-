@@ -49,6 +49,12 @@ export const router = createRouter({
           meta: { title: '佛法文檔管理' },
         },
         {
+          path: 'sutras',
+          name: 'sutras',
+          component: () => import('../views/SutrasView.vue'),
+          meta: { title: '經文管理' },
+        },
+        {
           path: 'about',
           name: 'about',
           component: () => import('../views/AboutView.vue'),

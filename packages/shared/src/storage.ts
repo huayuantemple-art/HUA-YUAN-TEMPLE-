@@ -13,6 +13,26 @@ export function storagePublicUrl(supabaseUrl: string, bucket: string, path: stri
   return `${supabaseUrl.replace(/\/$/, '')}/storage/v1/object/public/${bucket}/${encodeURIComponent(path)}`
 }
 
+export function storageSafeObjectPath(
+  filename: string,
+  extension: string,
+  fallbackStem = 'document',
+): string {
+  const safeExtension = extension.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
+  const rawName = filename.split(/[\\/]/).pop()?.trim() || ''
+  const extensionPattern = new RegExp(`\\.${safeExtension}$`, 'i')
+  const stem = rawName
+    .replace(extensionPattern, '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^[._-]+|[._-]+$/g, '')
+
+  return `${stem || fallbackStem}.${safeExtension}`
+}
+
 export function versionedStoragePublicUrl(
   supabaseUrl: string,
   bucket: string,

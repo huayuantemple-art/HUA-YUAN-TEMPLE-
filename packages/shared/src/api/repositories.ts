@@ -8,6 +8,7 @@ import type {
   DocumentRow,
   NewRegistration,
   Registration,
+  Sutra,
   Video,
 } from '../types'
 
@@ -80,6 +81,7 @@ export function createApi(options: ApiOptions) {
   const courses = tableRepo<Course>(http, 'courses')
   const videos = tableRepo<Video>(http, 'videos')
   const documents = tableRepo<DocumentRow>(http, 'documents')
+  const sutras = tableRepo<Sutra>(http, 'sutras')
   const registrationsBase = tableRepo<Registration>(http, 'registrations')
 
   return {
@@ -107,6 +109,24 @@ export function createApi(options: ApiOptions) {
       /** 前台:已發布,舊→新(同舊站 ascending 排序) */
       listPublished: () => documents.list({ status: 'eq.已發布', order: 'created_at.asc' }),
       listAll: () => documents.list({ order: 'created_at.desc' }),
+    },
+    sutras: {
+      ...sutras,
+      /** 前台:僅已發布,依法寶略節序號排序 */
+      listPublished: () => sutras.list({ status: 'eq.已發布', order: 'seq.asc' }),
+      getPublished: async (id: number): Promise<Sutra | null> => {
+        const rows = await sutras.list({ id: `eq.${id}`, status: 'eq.已發布', limit: '1' })
+        return rows[0] ?? null
+      },
+      getHeartSutra: async (): Promise<Sutra | null> => {
+        const rows = await sutras.list({
+          title: 'eq.般若波羅蜜多心經',
+          status: 'eq.已發布',
+          limit: '1',
+        })
+        return rows[0] ?? null
+      },
+      listAll: () => sutras.list({ order: 'seq.asc' }),
     },
     about: singletonRepo<About>(http, 'about'),
     contact: singletonRepo<Contact>(http, 'contact'),

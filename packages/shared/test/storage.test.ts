@@ -3,6 +3,7 @@ import {
   IMAGE_BUCKET,
   PDF_BUCKET,
   storagePublicUrl,
+  storageSafeObjectPath,
   versionedStoragePublicUrl,
 } from '../src/storage'
 
@@ -23,5 +24,21 @@ describe('storagePublicUrl', () => {
     expect(
       versionedStoragePublicUrl('https://x.supabase.co', IMAGE_BUCKET, 'about-image.webp', 123),
     ).toBe('https://x.supabase.co/storage/v1/object/public/images/about-image.webp?v=123')
+  })
+})
+
+describe('storageSafeObjectPath', () => {
+  it('將中文檔名轉成 Supabase Storage 可接受的 ASCII key', () => {
+    expect(storageSafeObjectPath('1.大般若波羅蜜多經卷第五百七十四.docx', 'docx')).toBe(
+      '1.docx',
+    )
+  })
+
+  it('清理空白與特殊符號並保留副檔名', () => {
+    expect(storageSafeObjectPath('Heart Sutra #1.pdf', 'pdf')).toBe('heart-sutra-1.pdf')
+  })
+
+  it('無可用 ASCII stem 時使用 fallback', () => {
+    expect(storageSafeObjectPath('心經註解.pdf', 'pdf', 'document-123')).toBe('document-123.pdf')
   })
 })

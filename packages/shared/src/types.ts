@@ -54,6 +54,18 @@ export interface DocumentRow {
   created_at: string
 }
 
+export type SutraStatus = '草稿' | '已發布'
+
+export interface Sutra {
+  id: number
+  seq: number
+  title: string
+  translator: string | null
+  content: string
+  status: SutraStatus
+  created_at: string
+}
+
 export interface About {
   id: number
   headline: string | null

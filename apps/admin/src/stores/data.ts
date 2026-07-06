@@ -1,35 +1,43 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Announcement, Course, DocumentRow, Registration, Video } from '@huayuan/shared'
+import type { Announcement, Course, DocumentRow, Registration, Sutra, Video } from '@huayuan/shared'
 import { api } from '../lib/api'
 
-/** 同舊站全域 state + loadAll():登入後一次載入五張表 */
+/** 同舊站全域 state + loadAll():登入後一次載入內容表 */
 export const useDataStore = defineStore('data', () => {
   const announcements = ref<Announcement[]>([])
   const courses = ref<Course[]>([])
   const videos = ref<Video[]>([])
   const documents = ref<DocumentRow[]>([])
+  const sutras = ref<Sutra[]>([])
   const registrations = ref<Registration[]>([])
   const loaded = ref(false)
 
-  async function loadAll(): Promise<void> {
+  async function keepSuccessful<T>(label: string, promise: Promise<T[]>): Promise<T[] | null> {
     try {
-      const [a, c, v, d, r] = await Promise.all([
-        api.announcements.listAll(),
-        api.courses.listAll(),
-        api.videos.listAll(),
-        api.documents.listAll(),
-        api.registrations.listAll(),
-      ])
-      announcements.value = a
-      courses.value = c
-      videos.value = v
-      documents.value = d
-      registrations.value = r
+      return await promise
     } catch (error) {
-      // 同舊站:載入失敗時各表維持空陣列,列表顯示空狀態
-      console.error('loadAll failed', error)
+      console.error(`loadAll ${label} failed`, error)
+      return null
     }
+  }
+
+  async function loadAll(): Promise<void> {
+    const [a, c, v, d, s, r] = await Promise.all([
+      keepSuccessful('announcements', api.announcements.listAll()),
+      keepSuccessful('courses', api.courses.listAll()),
+      keepSuccessful('videos', api.videos.listAll()),
+      keepSuccessful('documents', api.documents.listAll()),
+      keepSuccessful('sutras', api.sutras.listAll()),
+      keepSuccessful('registrations', api.registrations.listAll()),
+    ])
+
+    if (a) announcements.value = a
+    if (c) courses.value = c
+    if (v) videos.value = v
+    if (d) documents.value = d
+    if (s) sutras.value = s
+    if (r) registrations.value = r
     loaded.value = true
   }
 
@@ -45,6 +53,9 @@ export const useDataStore = defineStore('data', () => {
   async function reloadDocuments(): Promise<void> {
     documents.value = await api.documents.listAll()
   }
+  async function reloadSutras(): Promise<void> {
+    sutras.value = await api.sutras.listAll()
+  }
 
   /** 同舊站 renderReg():每次進頁/切換課程篩選時重新查詢 */
   async function fetchRegistrations(courseId: string): Promise<void> {
@@ -58,6 +69,7 @@ export const useDataStore = defineStore('data', () => {
     courses,
     videos,
     documents,
+    sutras,
     registrations,
     loaded,
     loadAll,
@@ -65,6 +77,7 @@ export const useDataStore = defineStore('data', () => {
     reloadCourses,
     reloadVideos,
     reloadDocuments,
+    reloadSutras,
     fetchRegistrations,
   }
 })

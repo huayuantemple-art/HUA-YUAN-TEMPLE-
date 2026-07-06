@@ -131,6 +131,31 @@ describe('createApi:repository 行為', () => {
     expect(params).toEqual({ select: '*', status: 'eq.已發布', order: 'created_at.desc' })
   })
 
+  it('sutras 前台只查已發布並依 seq 排序', async () => {
+    const api = createApi(BASE)
+    const calls: Array<{ path: string; params: Record<string, unknown> }> = []
+    api.http.defaults.adapter = fakeAdapter((config) => {
+      calls.push({
+        path: String(config.url),
+        params: { ...(config.params as Record<string, unknown>) },
+      })
+      return { status: 200, data: [] }
+    })
+
+    await api.sutras.listPublished()
+    await api.sutras.getPublished(3)
+    await api.sutras.getHeartSutra()
+
+    expect(calls).toEqual([
+      { path: '/sutras', params: { select: '*', status: 'eq.已發布', order: 'seq.asc' } },
+      { path: '/sutras', params: { select: '*', id: 'eq.3', status: 'eq.已發布', limit: '1' } },
+      {
+        path: '/sutras',
+        params: { select: '*', title: 'eq.般若波羅蜜多心經', status: 'eq.已發布', limit: '1' },
+      },
+    ])
+  })
+
   it('about.upsert 先 PATCH 固定 id=1(RLS 只授 admin UPDATE,不走 POST upsert)', async () => {
     const api = createApi(BASE)
     const calls: Array<{ method: string; params: Record<string, unknown>; body: unknown }> = []

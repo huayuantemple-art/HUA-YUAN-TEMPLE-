@@ -1,8 +1,30 @@
 <script setup lang="ts">
 const api = useApi()
-const pdfUrl = usePdfUrl()
-const { data: docs, pending } = useLazyAsyncData('documents', () => api.documents.listPublished())
+const { data: docs, pending: docsPending } = useLazyAsyncData('documents', () =>
+  api.documents.listPublished(),
+)
+const { data: sutras, pending: sutrasPending } = useLazyAsyncData('sutras', () =>
+  api.sutras.listPublished(),
+)
 const list = computed(() => docs.value ?? [])
+const readingList = computed(() => sutras.value ?? [])
+
+function documentExtension(filename: string): string {
+  return filename.split('.').pop()?.toUpperCase() || '檔案'
+}
+
+function documentDownloadName(name: string, filename: string): string {
+  const extension = filename.split('.').pop()?.toLowerCase()
+  return extension ? `${name}.${extension}` : name
+}
+
+function documentDownloadUrl(name: string, filename: string): string {
+  const params = new URLSearchParams({
+    path: filename,
+    name: documentDownloadName(name, filename),
+  })
+  return `/api/download?${params.toString()}`
+}
 </script>
 
 <template>
@@ -28,7 +50,7 @@ const list = computed(() => docs.value ?? [])
       </div>
       <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
       <div>
-        <div v-if="pending" class="loading">讀取中…</div>
+        <div v-if="docsPending" class="loading">讀取中…</div>
         <template v-else-if="list.length">
           <div v-for="d in list" :key="d.id" class="doc-item fadein">
             <div class="doc-icon">▤</div>
@@ -36,8 +58,10 @@ const list = computed(() => docs.value ?? [])
               <div class="doc-name">{{ d.name }}</div>
               <div class="doc-desc">{{ d.description || '' }}</div>
             </div>
-            <a class="doc-dl" :href="pdfUrl(d.filename)" target="_blank" rel="noopener"
-              >下載 PDF ↓</a
+            <a
+              class="doc-dl"
+              :href="documentDownloadUrl(d.name, d.filename)"
+              >下載 {{ documentExtension(d.filename) }} ↓</a
             >
           </div>
         </template>
@@ -57,47 +81,24 @@ const list = computed(() => docs.value ?? [])
         線上閱讀
       </div>
       <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
-      <div class="primer-reading-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px">
-        <NuxtLink class="dharma-card" to="/dharma" style="text-align: left; display: block">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 16px;
-            "
-          >
-            <div
-              style="
-                width: 46px;
-                height: 46px;
-                border: 1px solid #c9a24b;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-family: 'Noto Serif TC', serif;
-                color: #c9a24b;
-                font-size: 18px;
-              "
-            >
-              法
-            </div>
-            <span
-              style="
-                font-size: 11px;
-                padding: 3px 10px;
-                background: rgba(110, 140, 80, 0.15);
-                color: #5f7a3e;
-              "
-              >可閱讀</span
-            >
-          </div>
-          <div class="dharma-name">入佛門法要</div>
-          <p class="dharma-desc">三皈依、五戒、三學，初入佛門之綱要。</p>
-          <div class="dharma-more" style="margin-top: 14px">線上閱讀 →</div>
-        </NuxtLink>
-        <NuxtLink class="dharma-card" to="/sutra" style="text-align: left; display: block">
+      <div
+        v-if="sutrasPending"
+        class="loading"
+      >
+        讀取中…
+      </div>
+      <div
+        v-else-if="readingList.length"
+        class="primer-reading-grid"
+        style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px"
+      >
+        <NuxtLink
+          v-for="sutra in readingList"
+          :key="sutra.id"
+          class="dharma-card"
+          :to="`/sutra/${sutra.id}`"
+          style="text-align: left; display: block"
+        >
           <div
             style="
               display: flex;
@@ -132,11 +133,12 @@ const list = computed(() => docs.value ?? [])
               >可閱讀</span
             >
           </div>
-          <div class="dharma-name">般若波羅蜜多心經</div>
-          <p class="dharma-desc">二百六十字攝盡般若精要，照見五蘊皆空。</p>
+          <div class="dharma-name">{{ sutra.title }}</div>
+          <p class="dharma-desc">{{ sutra.translator || '法寶略節經文' }}</p>
           <div class="dharma-more" style="margin-top: 14px">閱讀經文 →</div>
         </NuxtLink>
       </div>
+      <div v-else class="empty-msg">目前尚無經文，敬請期待。</div>
     </div>
   </div>
 </template>

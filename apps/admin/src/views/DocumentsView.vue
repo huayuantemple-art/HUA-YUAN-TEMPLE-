@@ -4,6 +4,7 @@ import { useDialog, type DataTableColumns } from 'naive-ui'
 import {
   PDF_BUCKET,
   storagePublicUrl,
+  storageSafeObjectPath,
   type DocumentRow,
   type DocumentStatus,
 } from '@huayuan/shared'
@@ -55,10 +56,7 @@ function documentFileExtension(file: File): 'pdf' | 'docx' | null {
 
 function documentStoragePath(file: File): string {
   const extension = documentFileExtension(file) ?? 'pdf'
-  const fallback = `document-${Date.now()}.pdf`
-  const filename = file.name.split(/[\\/]/).pop()?.trim() || fallback
-  const safeName = filename.replace(/\s+/g, '-').replace(/[?#]/g, '')
-  return safeName.toLowerCase().endsWith(`.${extension}`) ? safeName : `${safeName}.${extension}`
+  return storageSafeObjectPath(file.name, extension, `document-${Date.now()}`)
 }
 
 async function uploadDocumentFile(event: Event) {

@@ -30,9 +30,10 @@ const INSERT_PAYLOAD: Record<string, object> = {
   courses: { name: 'pwn' },
   videos: { title: 'pwn' },
   documents: { name: 'pwn', filename: 'pwn.pdf' },
+  sutras: { seq: 9999, title: 'pwn', content: 'pwn' },
 }
 
-for (const t of ['announcements', 'courses', 'videos', 'documents']) {
+for (const t of ['announcements', 'courses', 'videos', 'documents', 'sutras']) {
   test(`匿名 INSERT ${t} 被拒`, async ({ request }) => {
     const resp = await request.post(rest(t), { headers: HEADERS, data: INSERT_PAYLOAD[t] })
     expect([401, 403]).toContain(resp.status())
@@ -79,11 +80,17 @@ async function expectSelectOk(request: APIRequestContext, path: string) {
   expect(resp.status()).toBe(200)
 }
 
-for (const t of ['announcements', 'courses', 'about', 'contact']) {
+for (const t of ['announcements', 'courses', 'about', 'contact', 'sutras']) {
   test(`匿名 SELECT ${t}(公開內容)正常`, async ({ request }) => {
     await expectSelectOk(request, `${t}?select=id&limit=1`)
   })
 }
+
+test('匿名 SELECT sutras 草稿回空集合', async ({ request }) => {
+  const resp = await request.get(rest('sutras?select=id&status=eq.草稿'), { headers: HEADERS })
+  expect(resp.status()).toBe(200)
+  expect(await resp.text()).toBe('[]')
+})
 
 test('匿名 Storage 上傳 pdfs 被拒(task 7.1 RLS)', async ({ request }) => {
   const resp = await request.post(`${SUPABASE_URL}/storage/v1/object/pdfs/rls-test.pdf`, {
