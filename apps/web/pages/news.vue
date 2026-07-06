@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const api = useApi()
+const { copy } = useSiteCopy()
 const { data: ann, pending } = useLazyAsyncData('announcements', () =>
   api.announcements.listPublished(),
 )
@@ -8,8 +9,15 @@ const filters = ['全部', '課程', '法會', '公告']
 // 同舊站:activeFilter 為 session 全域,離開再回來仍套用上次選的分類
 const activeFilter = useState('news-filter', () => '全部')
 
-// 同舊站:跑馬燈取前 6 筆,內容重複兩份以無縫循環
-const marqueeItems = computed(() => (ann.value ?? []).slice(0, 6))
+// 跑馬燈與月曆內容分離:後台「網站文案 > 跑馬燈內容」每行一則;
+// 留空時沿用舊行為(自動輪播最新公告標題前 6 筆)。內容重複兩份以無縫循環。
+const marqueeItems = computed(() => {
+  const custom = copy('news_marquee')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  return custom.length ? custom : (ann.value ?? []).slice(0, 6).map((n) => n.title)
+})
 const list = computed(() =>
   activeFilter.value === '全部'
     ? (ann.value ?? [])
@@ -30,8 +38,8 @@ const list = computed(() =>
         <div class="marquee-inner">
           <template v-for="dup in 2">
             <span
-              v-for="n in marqueeItems"
-              :key="`${dup}-${n.id}`"
+              v-for="(text, i) in marqueeItems"
+              :key="`${dup}-${i}`"
               style="
                 display: inline-flex;
                 align-items: center;
@@ -40,7 +48,7 @@ const list = computed(() =>
                 color: #f2e4c8;
                 font-size: 15px;
               "
-              ><span style="color: #c9a24b; font-size: 10px">◆</span>{{ n.title }}</span
+              ><span style="color: #c9a24b; font-size: 10px">◆</span>{{ text }}</span
             >
           </template>
         </div>

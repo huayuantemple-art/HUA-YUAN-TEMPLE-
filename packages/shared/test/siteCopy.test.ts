@@ -19,9 +19,14 @@ describe('SITE_COPY 清單', () => {
     expect(new Set(keys).size).toBe(keys.length)
   })
 
+  // news_marquee 為唯一動態預設:留空時前台自動輪播最新公告標題,故允許空預設值
+  const DYNAMIC_DEFAULT_KEYS = ['news_marquee']
+
   it('每筆皆有非空預設值與合法分組', () => {
     for (const def of SITE_COPY) {
-      expect(def.defaultValue.trim()).not.toBe('')
+      if (!DYNAMIC_DEFAULT_KEYS.includes(def.key)) {
+        expect(def.defaultValue.trim()).not.toBe('')
+      }
       expect(SITE_COPY_GROUPS).toContain(def.group)
       expect(def.label.trim()).not.toBe('')
     }

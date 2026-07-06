@@ -5,7 +5,14 @@
  * 僅收內容性文案;功能性文字(讀取中、驗證訊息、按鈕文字)不納管。
  */
 
-export const SITE_COPY_GROUPS = ['首頁', '關於我們', '法寶略節', '課程報名', '全站'] as const
+export const SITE_COPY_GROUPS = [
+  '首頁',
+  '最新公告',
+  '關於我們',
+  '法寶略節',
+  '課程報名',
+  '全站',
+] as const
 
 export type SiteCopyGroup = (typeof SITE_COPY_GROUPS)[number]
 
@@ -106,6 +113,15 @@ export const SITE_COPY = [
     group: '課程報名',
     label: '報名提示框 說明',
     defaultValue: '選擇課程後填寫個人資料，我們將於三個工作天內與您聯繫確認',
+  },
+  {
+    // 唯一動態預設的文案:留空時前台自動輪播最新公告標題(news.vue fallback),
+    // 故 defaultValue 為空字串,與「預設值=現行硬編碼文案」慣例不同
+    key: 'news_marquee',
+    group: '最新公告',
+    label: '跑馬燈內容(每行一則;留空＝自動輪播最新公告標題)',
+    defaultValue: '',
+    multiline: true,
   },
   {
     key: 'footer_brand_desc',
