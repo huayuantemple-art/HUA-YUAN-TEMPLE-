@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const api = useApi()
+const { copy } = useSiteCopy()
 const { data: docs, pending: docsPending } = useLazyAsyncData('documents', () =>
   api.documents.listPublished(),
 )
@@ -32,9 +33,7 @@ function documentDownloadUrl(name: string, filename: string): string {
     <div class="banner">
       <div class="banner-en">DHARMA PRIMER</div>
       <h1>法寶略節</h1>
-      <p>華嚴經云:信為道元功德母,
-        增長一切諸善法
-        於至誠心深信恭敬</p>
+      <p>{{ copy('primer_banner_quote') }}</p>
     </div>
     <div class="primer-wrap" style="max-width: 1080px; margin: 0 auto; padding: 60px 40px 80px">
       <div
@@ -130,11 +129,11 @@ function documentDownloadUrl(name: string, filename: string): string {
                 background: rgba(110, 140, 80, 0.15);
                 color: #5f7a3e;
               "
-              >可閱讀</span
+              >{{ copy('primer_reading_badge') }}</span
             >
           </div>
           <div class="dharma-name">{{ sutra.title }}</div>
-          <p class="dharma-desc">{{ sutra.translator || '法寶略節經文' }}</p>
+          <p class="dharma-desc">{{ sutra.translator || copy('primer_reading_fallback_desc') }}</p>
           <div class="dharma-more" style="margin-top: 14px">閱讀經文 →</div>
         </NuxtLink>
       </div>
