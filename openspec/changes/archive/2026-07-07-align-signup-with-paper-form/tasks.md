@@ -19,4 +19,4 @@
 
 - [x] 4.1 `pnpm lint`、`pnpm typecheck`、shared 測試通過
 - [x] 4.2 瀏覽器驗證表單：必填驗證（含年齡格式）、單/複選互動、未同意隱私不可送出；不實際送出（dev 連 production DB 且 migration 未套用）
-- [ ] 4.3 提醒用戶：先於 Supabase Dashboard 套用 migration，再部署 web/admin（順序不可反）
+- [x] 4.3 提醒用戶：先於 Supabase Dashboard 套用 migration，再部署 web/admin（順序不可反）→ 實際以 run-migration.sh 先套用 migration（已記入 schema_migrations），再 CLI 部署 web/admin，並以匿名 insert 端到端驗證後清除測試資料
