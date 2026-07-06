@@ -2,6 +2,7 @@
 import { escapeHtml } from '@huayuan/shared'
 
 const api = useApi()
+const { copy, copyHtml } = useSiteCopy()
 const { data: about } = useLazyAsyncData('about', () => api.about.get())
 
 const defaultValues = [
@@ -45,14 +46,12 @@ const values = computed(() =>
     <div class="banner about-banner">
       <div class="banner-en">ABOUT US</div>
       <h1>華圓覺苑簡介</h1>
-      <p>
-        華開舜若因緣多 <br />
-        勝境無窮更得安
-      </p>
+      <!-- eslint-disable-next-line vue/no-v-html -- copyHtml 已 escapeHtml,僅換行轉受控 <br> -->
+      <p v-html="copyHtml('about_banner_verse')"></p>
     </div>
     <section class="about-intro">
       <div class="about-copy-panel">
-        <div class="sec-en about-section-kicker">弘揚淨土 持戒念佛</div>
+        <div class="sec-en about-section-kicker">{{ copy('about_kicker') }}</div>
         <!-- eslint-disable vue/no-v-html -- 內容已 escapeHtml,僅插入受控 <br>(同舊站) -->
         <h2 class="about-headline" v-html="headlineHtml"></h2>
         <!-- eslint-disable vue/no-v-html -- DB 文字已 escapeHtml,僅保留換行 -->
