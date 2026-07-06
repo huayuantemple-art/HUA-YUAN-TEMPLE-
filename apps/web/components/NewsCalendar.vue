@@ -32,28 +32,49 @@ const byDay = computed(() => {
   return map
 })
 
-// 初始月份 = 最新一筆可解析公告的年月;都不可解析時退回今天(客戶端才會修正,見 onMounted)
-const first = items.value[0]
-const viewYear = ref(first?.year ?? 2026)
-const viewMonth = ref(first?.month ?? 1)
+// 初始月份錨定「今天之後最近的公告月份」(行事曆語意:先看接下來要幹嘛),
+// 沒有未來公告則退回最近的過去公告月份;完全沒有公告退回當月。
+// ISR 60s 再生,setup 於 server 取日期的誤差最多一天,只在跨月邊界影響落點,可接受。
+function anchorMonth(): { year: number; month: number } {
+  const now = new Date()
+  const todayKey = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate()
+  const keyOf = (i: CalItem) => i.year * 10000 + i.month * 100 + i.day
+  const sorted = [...items.value].sort((a, b) => keyOf(a) - keyOf(b))
+  const pick = sorted.find((i) => keyOf(i) >= todayKey) ?? sorted[sorted.length - 1]
+  return pick
+    ? { year: pick.year, month: pick.month }
+    : { year: now.getFullYear(), month: now.getMonth() + 1 }
+}
+const initial = anchorMonth()
+const viewYear = ref(initial.year)
+const viewMonth = ref(initial.month)
 
 const selected = ref<{ year: number; month: number; day: number } | null>(null)
+// 使用者手動切月/選日後,資料補到也不再自動跳月
+const userTouched = ref(false)
 
 // 「今天」於 mounted 後在客戶端套用(僅作月格標記),避免 server 時區差異進 ISR 快取
 const today = ref<{ year: number; month: number; day: number } | null>(null)
 onMounted(() => {
   const now = new Date()
   today.value = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() }
-  if (!first) {
-    viewYear.value = today.value.year
-    viewMonth.value = today.value.month
-  }
+})
+
+// 客戶端導頁進來時資料晚於 setup 才到,補到後重新錨定月份
+watch(items, () => {
+  if (userTouched.value) return
+  const anchor = anchorMonth()
+  viewYear.value = anchor.year
+  viewMonth.value = anchor.month
 })
 
 function shiftMonth(delta: number) {
+  userTouched.value = true
   const next = new Date(viewYear.value, viewMonth.value - 1 + delta, 1)
   viewYear.value = next.getFullYear()
   viewMonth.value = next.getMonth() + 1
+  // 換月後下方列表改列新月份,原本選的日期已不在畫面上,一併清除
+  selected.value = null
 }
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
@@ -81,8 +102,9 @@ function isToday(day: number) {
   const t = today.value
   return !!t && t.year === viewYear.value && t.month === viewMonth.value && t.day === day
 }
-// 再點一次已選日期 = 取消選取,回到完整列表
+// 再點一次已選日期 = 取消選取,回到本月列表
 function selectDay(day: number) {
+  userTouched.value = true
   selected.value = isSelected(day)
     ? null
     : { year: viewYear.value, month: viewMonth.value, day }
@@ -92,28 +114,26 @@ function dateLabel(year: number, month: number, day: number) {
   return `${year} 年 ${month} 月 ${day} 日`
 }
 
-// 日曆下方列表:未選日期時列出全部(依日期倒序分組),選了日期只列該日
+// 日曆下方列表與月曆對應:未選日期時列出「顯示中月份」的公告(依日序),選了日期只列該日
 const groups = computed(() => {
   const s = selected.value
   if (s) {
     const anns = (byDay.value.get(`${s.year}-${s.month}-${s.day}`) ?? []).map((i) => i.ann)
     return [{ label: dateLabel(s.year, s.month, s.day), anns }]
   }
-  const map = new Map<string, { label: string; anns: Announcement[]; sortKey: number }>()
-  for (const item of items.value) {
-    const key = `${item.year}-${item.month}-${item.day}`
-    let group = map.get(key)
+  const map = new Map<number, { label: string; anns: Announcement[] }>()
+  const monthItems = items.value.filter(
+    (item) => item.year === viewYear.value && item.month === viewMonth.value,
+  )
+  for (const item of monthItems) {
+    let group = map.get(item.day)
     if (!group) {
-      group = {
-        label: dateLabel(item.year, item.month, item.day),
-        anns: [],
-        sortKey: new Date(item.year, item.month - 1, item.day).getTime(),
-      }
-      map.set(key, group)
+      group = { label: dateLabel(item.year, item.month, item.day), anns: [] }
+      map.set(item.day, group)
     }
     group.anns.push(item.ann)
   }
-  const dated = [...map.values()].sort((a, b) => b.sortKey - a.sortKey)
+  const dated = [...map.entries()].sort((a, b) => a[0] - b[0]).map(([, group]) => group)
   // date 無法解析的公告仍列於最末(不進月格,但不隱形)
   const undated = props.announcements.filter((ann) => !parseAnnouncementDate(ann.date))
   return undated.length ? [...dated, { label: '日期未定', anns: undated }] : dated
@@ -161,7 +181,7 @@ const groups = computed(() => {
         </div>
       </template>
       <div v-else-if="selected" class="empty-msg">此日期無公告。</div>
-      <div v-else class="empty-msg">此分類目前尚無公告。</div>
+      <div v-else class="empty-msg">本月無公告，可用上方 ‹ › 切換月份查看。</div>
     </div>
   </div>
 </template>
