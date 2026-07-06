@@ -8,7 +8,6 @@ const PAGES: Array<{ path: string; heading: string }> = [
   { path: '/course', heading: '課程報名' },
   { path: '/contact', heading: '聯絡我們' },
   { path: '/about', heading: '關於我們' },
-  { path: '/dharma', heading: '入佛門法要' },
   { path: '/sutra', heading: '般若波羅蜜多心經' },
 ]
 

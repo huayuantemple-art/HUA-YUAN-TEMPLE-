@@ -119,23 +119,17 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
           <div class="sec-title">法寶略節</div>
           <p style="font-size: 15px; color: #8a6f55; margin: 8px 0 0">循序漸進，建立正知正見</p>
         </div>
-        <div class="grid3">
-          <NuxtLink class="dharma-card" to="/dharma">
+        <div class="grid2">
+          <NuxtLink class="dharma-card" to="/sutra">
             <div class="dharma-num">壹</div>
             <div class="dharma-name">{{ copy('home_primer_card1_title') }}</div>
             <p class="dharma-desc">{{ copy('home_primer_card1_desc') }}</p>
-            <div class="dharma-more">線上閱讀 →</div>
-          </NuxtLink>
-          <NuxtLink class="dharma-card" to="/sutra">
-            <div class="dharma-num">貳</div>
-            <div class="dharma-name">{{ copy('home_primer_card2_title') }}</div>
-            <p class="dharma-desc">{{ copy('home_primer_card2_desc') }}</p>
             <div class="dharma-more">閱讀經文 →</div>
           </NuxtLink>
           <NuxtLink class="dharma-card" to="/primer">
-            <div class="dharma-num">參</div>
-            <div class="dharma-name">{{ copy('home_primer_card3_title') }}</div>
-            <p class="dharma-desc">{{ copy('home_primer_card3_desc') }}</p>
+            <div class="dharma-num">貳</div>
+            <div class="dharma-name">{{ copy('home_primer_card2_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card2_desc') }}</p>
             <div class="dharma-more">前往下載 →</div>
           </NuxtLink>
         </div>

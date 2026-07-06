@@ -46,7 +46,6 @@ export default defineNuxtConfig({
     '/course': { isr: 60 },
     '/contact': { isr: 60 },
     '/about': { isr: 60 },
-    '/dharma': { isr: 60 },
     '/sutra': { isr: 60 },
     '/sutra/**': { isr: 60 },
     '/signup': { isr: false },

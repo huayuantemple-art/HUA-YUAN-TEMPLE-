@@ -19,7 +19,6 @@ const NAV_CONTENT = [
   { name: 'videos', icon: '▷', label: '法師說法' },
   { name: 'documents', icon: '▤', label: '佛法文檔' },
   { name: 'sutras', icon: '經', label: '經文管理' },
-  { name: 'dharma', icon: '法', label: '法要管理' },
 ] as const
 
 const NAV_SETTINGS = [

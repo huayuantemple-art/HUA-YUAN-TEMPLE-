@@ -55,12 +55,6 @@ export const router = createRouter({
           meta: { title: '經文管理' },
         },
         {
-          path: 'dharma',
-          name: 'dharma',
-          component: () => import('../views/DharmaView.vue'),
-          meta: { title: '法要管理' },
-        },
-        {
           path: 'site-copy',
           name: 'site-copy',
           component: () => import('../views/SiteCopyView.vue'),

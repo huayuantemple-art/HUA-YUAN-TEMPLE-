@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import type {
   Announcement,
   Course,
-  DharmaSection,
   DocumentRow,
   Registration,
   SiteContent,
@@ -19,7 +18,6 @@ export const useDataStore = defineStore('data', () => {
   const videos = ref<Video[]>([])
   const documents = ref<DocumentRow[]>([])
   const sutras = ref<Sutra[]>([])
-  const dharmaSections = ref<DharmaSection[]>([])
   const siteContent = ref<SiteContent[]>([])
   const registrations = ref<Registration[]>([])
   const loaded = ref(false)
@@ -34,13 +32,12 @@ export const useDataStore = defineStore('data', () => {
   }
 
   async function loadAll(): Promise<void> {
-    const [a, c, v, d, s, dh, sc, r] = await Promise.all([
+    const [a, c, v, d, s, sc, r] = await Promise.all([
       keepSuccessful('announcements', api.announcements.listAll()),
       keepSuccessful('courses', api.courses.listAll()),
       keepSuccessful('videos', api.videos.listAll()),
       keepSuccessful('documents', api.documents.listAll()),
       keepSuccessful('sutras', api.sutras.listAll()),
-      keepSuccessful('dharmaSections', api.dharmaSections.listAll()),
       keepSuccessful('siteContent', api.siteContent.list()),
       keepSuccessful('registrations', api.registrations.listAll()),
     ])
@@ -50,7 +47,6 @@ export const useDataStore = defineStore('data', () => {
     if (v) videos.value = v
     if (d) documents.value = d
     if (s) sutras.value = s
-    if (dh) dharmaSections.value = dh
     if (sc) siteContent.value = sc
     if (r) registrations.value = r
     loaded.value = true
@@ -71,9 +67,6 @@ export const useDataStore = defineStore('data', () => {
   async function reloadSutras(): Promise<void> {
     sutras.value = await api.sutras.listAll()
   }
-  async function reloadDharmaSections(): Promise<void> {
-    dharmaSections.value = await api.dharmaSections.listAll()
-  }
   async function reloadSiteContent(): Promise<void> {
     siteContent.value = await api.siteContent.list()
   }
@@ -91,7 +84,6 @@ export const useDataStore = defineStore('data', () => {
     videos,
     documents,
     sutras,
-    dharmaSections,
     siteContent,
     registrations,
     loaded,
@@ -101,7 +93,6 @@ export const useDataStore = defineStore('data', () => {
     reloadVideos,
     reloadDocuments,
     reloadSutras,
-    reloadDharmaSections,
     reloadSiteContent,
     fetchRegistrations,
   }
