@@ -39,7 +39,7 @@ const viewMonth = ref(first?.month ?? 1)
 
 const selected = ref<{ year: number; month: number; day: number } | null>(null)
 
-// 「今天」於 mounted 後在客戶端套用,避免 server 時區差異進 ISR 快取
+// 「今天」於 mounted 後在客戶端套用(僅作月格標記),避免 server 時區差異進 ISR 快取
 const today = ref<{ year: number; month: number; day: number } | null>(null)
 onMounted(() => {
   const now = new Date()
@@ -47,9 +47,6 @@ onMounted(() => {
   if (!first) {
     viewYear.value = today.value.year
     viewMonth.value = today.value.month
-  }
-  if (today.value.year === viewYear.value && today.value.month === viewMonth.value) {
-    selected.value = today.value
   }
 })
 
@@ -84,18 +81,42 @@ function isToday(day: number) {
   const t = today.value
   return !!t && t.year === viewYear.value && t.month === viewMonth.value && t.day === day
 }
+// 再點一次已選日期 = 取消選取,回到完整列表
 function selectDay(day: number) {
-  selected.value = { year: viewYear.value, month: viewMonth.value, day }
+  selected.value = isSelected(day)
+    ? null
+    : { year: viewYear.value, month: viewMonth.value, day }
 }
 
-const selectedItems = computed(() => {
+function dateLabel(year: number, month: number, day: number) {
+  return `${year} 年 ${month} 月 ${day} 日`
+}
+
+// 日曆下方列表:未選日期時列出全部(依日期倒序分組),選了日期只列該日
+const groups = computed(() => {
   const s = selected.value
-  if (!s) return []
-  return byDay.value.get(`${s.year}-${s.month}-${s.day}`) ?? []
-})
-const selectedLabel = computed(() => {
-  const s = selected.value
-  return s ? `${s.year} 年 ${s.month} 月 ${s.day} 日` : ''
+  if (s) {
+    const anns = (byDay.value.get(`${s.year}-${s.month}-${s.day}`) ?? []).map((i) => i.ann)
+    return [{ label: dateLabel(s.year, s.month, s.day), anns }]
+  }
+  const map = new Map<string, { label: string; anns: Announcement[]; sortKey: number }>()
+  for (const item of items.value) {
+    const key = `${item.year}-${item.month}-${item.day}`
+    let group = map.get(key)
+    if (!group) {
+      group = {
+        label: dateLabel(item.year, item.month, item.day),
+        anns: [],
+        sortKey: new Date(item.year, item.month - 1, item.day).getTime(),
+      }
+      map.set(key, group)
+    }
+    group.anns.push(item.ann)
+  }
+  const dated = [...map.values()].sort((a, b) => b.sortKey - a.sortKey)
+  // date 無法解析的公告仍列於最末(不進月格,但不隱形)
+  const undated = props.announcements.filter((ann) => !parseAnnouncementDate(ann.date))
+  return undated.length ? [...dated, { label: '日期未定', anns: undated }] : dated
 })
 </script>
 
@@ -123,20 +144,24 @@ const selectedLabel = computed(() => {
       </template>
     </div>
     <div class="news-cal-detail">
-      <template v-if="selected">
-        <div class="news-cal-detail-date">{{ selectedLabel }}</div>
-        <template v-if="selectedItems.length">
-          <div v-for="item in selectedItems" :key="item.ann.id" class="news-cal-detail-item">
-            <span class="news-cal-detail-tag">{{ item.ann.tag }}</span>
+      <div v-if="selected" class="news-cal-detail-bar">
+        <span>僅顯示所選日期</span>
+        <button class="news-cal-clear" @click="selected = null">顯示全部 ×</button>
+      </div>
+      <template v-if="groups.some((g) => g.anns.length)">
+        <div v-for="g in groups" :key="g.label" class="news-cal-group">
+          <div class="news-cal-detail-date">{{ g.label }}</div>
+          <div v-for="ann in g.anns" :key="ann.id" class="news-cal-detail-item">
+            <span class="news-cal-detail-tag">{{ ann.tag }}</span>
             <div>
-              <div class="news-cal-detail-title">{{ item.ann.title }}</div>
-              <p class="news-cal-detail-content">{{ item.ann.content || '' }}</p>
+              <div class="news-cal-detail-title">{{ ann.title }}</div>
+              <p class="news-cal-detail-content">{{ ann.content || '' }}</p>
             </div>
           </div>
-        </template>
-        <div v-else class="empty-msg">此日期無公告。</div>
+        </div>
       </template>
-      <div v-else class="empty-msg">點選有標記的日期查看公告。</div>
+      <div v-else-if="selected" class="empty-msg">此日期無公告。</div>
+      <div v-else class="empty-msg">此分類目前尚無公告。</div>
     </div>
   </div>
 </template>
