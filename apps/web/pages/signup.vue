@@ -36,8 +36,35 @@ watch(
   { immediate: true },
 )
 
-const form = reactive({ name: '', phone: '', email: '', note: '' })
-const errors = reactive({ name: false, phone: false, email: false, privacy: false })
+// 欄位與選項比照紙本「佛法入門班報名表」(align-signup-with-paper-form)
+const GENDER_OPTIONS = ['男', '女'] as const
+const VENUE_OPTIONS = ['華圓新莊講堂', '華圓台東講堂'] as const
+const BACKGROUND_OPTIONS = ['初次接觸佛法', '曾自行閱讀相關書籍', '曾於道場或寺院修學'] as const
+const REFERRAL_OPTIONS = [
+  '親友介紹',
+  '道場網站',
+  '社群媒體（Facebook、Instagram）',
+  '其他',
+] as const
+const EXPECTATION_OPTIONS = [
+  '頂戴正信佛教',
+  '希望有世間活動（例如：園遊會、團康活動）',
+  '其他',
+] as const
+
+const form = reactive({
+  name: '',
+  phone: '',
+  email: '',
+  age: '',
+  gender: '',
+  venue: '',
+  background: '',
+  referral: [] as string[],
+  expectation: [] as string[],
+  note: '',
+})
+const errors = reactive({ name: false, phone: false, email: false, age: false, privacy: false })
 const agreePrivacy = ref(false)
 const submitting = ref(false)
 
@@ -89,13 +116,14 @@ function recordSubmit() {
 async function submitForm() {
   if (!selectedCourse.value || submitting.value) return
 
-  // 驗證(同舊站:姓名/電話必填,Email 若填需符合格式)+ 隱私權同意
+  // 驗證(比照紙本必填:姓名/電話/Email/年齡)+ 隱私權同意
   errors.name = !form.name.trim()
   errors.phone = !form.phone.trim()
   const email = form.email.trim()
-  errors.email = !!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  errors.email = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  errors.age = !/^\d{1,3}$/.test(form.age.trim())
   errors.privacy = !agreePrivacy.value
-  if (errors.name || errors.phone || errors.email || errors.privacy) return
+  if (errors.name || errors.phone || errors.email || errors.age || errors.privacy) return
 
   // honeypot 被填寫 → 視為機器人,顯示成功但不寫入(真人不會碰到隱藏欄位)
   if (honeypot.value) {
@@ -116,6 +144,12 @@ async function submitForm() {
       name: form.name.trim(),
       phone: form.phone.trim(),
       email,
+      age: form.age.trim(),
+      gender: form.gender || null,
+      venue: form.venue || null,
+      dharma_background: form.background || null,
+      referral_source: form.referral.length ? form.referral.join('、') : null,
+      expectation: form.expectation.length ? form.expectation.join('、') : null,
       note: form.note.trim(),
     })
     recordSubmit()
@@ -210,6 +244,8 @@ async function submitForm() {
             </div>
           </div>
 
+          <div class="form-section">基本資料</div>
+
           <div class="field">
             <label class="lbl required">您的姓名</label>
             <input
@@ -236,7 +272,7 @@ async function submitForm() {
           </div>
 
           <div class="field">
-            <label class="lbl">電子信箱</label>
+            <label class="lbl required">電子信箱</label>
             <input
               v-model="form.email"
               class="inp"
@@ -244,12 +280,84 @@ async function submitForm() {
               type="email"
               placeholder="your@email.com"
             />
-            <div class="field-hint">若希望收到報名確認信，請填寫</div>
-            <div v-show="errors.email" class="err-msg" style="display: block">Email 格式不正確</div>
+            <div v-show="errors.email" class="err-msg" style="display: block">
+              請填寫正確格式的 Email
+            </div>
           </div>
 
           <div class="field">
-            <label class="lbl">備註說明</label>
+            <label class="lbl required">年齡</label>
+            <input
+              v-model="form.age"
+              class="inp"
+              :class="{ error: errors.age }"
+              type="text"
+              inputmode="numeric"
+              placeholder="請輸入年齡"
+              maxlength="3"
+            />
+            <div v-show="errors.age" class="err-msg" style="display: block">請填寫年齡（數字）</div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">性別</label>
+            <div class="opt-group">
+              <label v-for="g in GENDER_OPTIONS" :key="g" class="opt">
+                <input v-model="form.gender" type="radio" name="gender" :value="g" />
+                <span>{{ g }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">上課地點</label>
+            <div class="opt-group">
+              <label v-for="v in VENUE_OPTIONS" :key="v" class="opt">
+                <input v-model="form.venue" type="radio" name="venue" :value="v" />
+                <span>{{ v }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">招生對象</label>
+            <div class="field-hint" style="margin-top: 0">18~65 歲，無不良嗜好之四眾弟子</div>
+          </div>
+
+          <div class="form-section">學員背景</div>
+
+          <div class="field">
+            <label class="lbl">修學背景 <span class="lbl-note">（請選擇一項）</span></label>
+            <div class="opt-group opt-col">
+              <label v-for="b in BACKGROUND_OPTIONS" :key="b" class="opt">
+                <input v-model="form.background" type="radio" name="background" :value="b" />
+                <span>{{ b }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">如何得知本課程 <span class="lbl-note">（可複選）</span></label>
+            <div class="opt-group opt-col">
+              <label v-for="r in REFERRAL_OPTIONS" :key="r" class="opt">
+                <input v-model="form.referral" type="checkbox" :value="r" />
+                <span>{{ r }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">希望從課程中獲得什麼 <span class="lbl-note">（可複選）</span></label>
+            <div class="opt-group opt-col">
+              <label v-for="e in EXPECTATION_OPTIONS" :key="e" class="opt">
+                <input v-model="form.expectation" type="checkbox" :value="e" />
+                <span>{{ e }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">備註說明 <span class="lbl-note">（可以提供您的意見或想法）</span></label>
             <textarea
               v-model="form.note"
               class="inp"
@@ -493,6 +601,50 @@ main {
 
 .field {
   margin-bottom: 20px;
+}
+
+/* 表單分段(比照紙本「基本資料/學員背景」) */
+.form-section {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 16px;
+  color: var(--brown);
+  letter-spacing: 0.08em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gold);
+  margin: 28px 0 20px;
+}
+.form-section:first-of-type {
+  margin-top: 0;
+}
+.lbl-note {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 單/複選選項群(視覺沿用表單既有語彙) */
+.opt-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+.opt-group.opt-col {
+  flex-direction: column;
+  gap: 10px;
+}
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14.5px;
+  color: var(--text);
+  line-height: 1.6;
+  cursor: pointer;
+}
+.opt input {
+  margin-top: 4px;
+  accent-color: var(--gold);
+  flex-shrink: 0;
 }
 label.lbl {
   display: block;

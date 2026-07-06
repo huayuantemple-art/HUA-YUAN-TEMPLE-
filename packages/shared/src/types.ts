@@ -104,6 +104,18 @@ export interface Registration {
   name: string
   phone: string | null
   email: string | null
+  /** 年齡(前端驗證 1~3 位數字) */
+  age: string | null
+  /** 性別:男/女 */
+  gender: string | null
+  /** 上課地點:華圓新莊講堂/華圓台東講堂 */
+  venue: string | null
+  /** 修學背景(單選) */
+  dharma_background: string | null
+  /** 如何得知本課程(複選,「、」串接) */
+  referral_source: string | null
+  /** 希望從課程中獲得什麼(複選,「、」串接) */
+  expectation: string | null
   note: string | null
   created_at: string
 }

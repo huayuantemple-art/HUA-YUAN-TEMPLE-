@@ -49,6 +49,25 @@ const columns: DataTableColumns<Registration> = [
     render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.email || '—'),
   },
   {
+    title: '年齡',
+    key: 'age',
+    width: 64,
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.age || '—'),
+  },
+  {
+    title: '性別',
+    key: 'gender',
+    width: 64,
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.gender || '—'),
+  },
+  {
+    title: '上課地點',
+    key: 'venue',
+    width: 120,
+    ellipsis: { tooltip: true },
+    render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.venue || '—'),
+  },
+  {
     title: '報名時間',
     key: 'created_at',
     width: 110,
@@ -67,13 +86,34 @@ function exportCSV() {
     toast('沒有資料可匯出', true)
     return
   }
-  const rows = [['姓名', '課程', '電話', 'Email', '備註', '報名時間']]
+  const rows = [
+    [
+      '姓名',
+      '課程',
+      '電話',
+      'Email',
+      '年齡',
+      '性別',
+      '上課地點',
+      '修學背景',
+      '如何得知本課程',
+      '課程期望',
+      '備註',
+      '報名時間',
+    ],
+  ]
   data.registrations.forEach((r) =>
     rows.push([
       r.name,
       r.course_name || '',
       r.phone || '',
       r.email || '',
+      r.age || '',
+      r.gender || '',
+      r.venue || '',
+      r.dharma_background || '',
+      r.referral_source || '',
+      r.expectation || '',
       r.note || '',
       r.created_at ? r.created_at.slice(0, 10) : '',
     ]),
