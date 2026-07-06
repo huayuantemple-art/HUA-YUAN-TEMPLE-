@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const api = useApi()
+const { copy } = useSiteCopy()
 // 與聯絡頁共用 'contact' key(同舊站 _contact 快取,只取一次)
 const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
 </script>
@@ -12,7 +13,7 @@ const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
         <div style="font-size: 11px; letter-spacing: 0.3em; color: #c9a24b; margin-bottom: 14px">
           HUA YUAN MONASTERY
         </div>
-        <p class="footer-desc">承續千年法脈，弘揚正信佛法，接引現代學人。</p>
+        <p class="footer-desc">{{ copy('footer_brand_desc') }}</p>
       </div>
       <div>
         <div class="footer-title">快速連結</div>
@@ -39,6 +40,6 @@ const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
         </div>
       </div>
     </div>
-    <div class="footer-bottom">© 華圓覺苑 HUA YUAN MONASTERY · 南無阿彌陀佛</div>
+    <div class="footer-bottom">{{ copy('footer_copyright') }}</div>
   </footer>
 </template>
