@@ -11,7 +11,7 @@ const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
       <div>
         <div class="footer-logo-text">華圓覺苑</div>
         <div style="font-size: 11px; letter-spacing: 0.3em; color: #c9a24b; margin-bottom: 14px">
-          HUA YUAN MONASTERY
+          HUA YUAN TEMPLE
         </div>
         <p class="footer-desc">{{ copy('footer_brand_desc') }}</p>
       </div>

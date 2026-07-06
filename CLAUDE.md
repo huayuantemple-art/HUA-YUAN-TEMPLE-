@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-華圓覺苑 (HUA YUAN MONASTERY) temple website — a pnpm workspace monorepo on a Nuxt/Vite + Supabase stack. The migration from the legacy single-file HTML site is **complete** (cutover done, legacy files deleted); development is spec-driven via OpenSpec. Active change proposals live in `openspec/changes/<name>/` (`proposal.md`, `design.md`, `tasks.md` track progress); completed changes are archived under `openspec/changes/archive/`. No changes are currently active — main specs in `openspec/specs/` reflect the shipped state.
+華圓覺苑 (HUA YUAN TEMPLE) temple website — a pnpm workspace monorepo on a Nuxt/Vite + Supabase stack. The migration from the legacy single-file HTML site is **complete** (cutover done, legacy files deleted); development is spec-driven via OpenSpec. Active change proposals live in `openspec/changes/<name>/` (`proposal.md`, `design.md`, `tasks.md` track progress); completed changes are archived under `openspec/changes/archive/`. No changes are currently active — main specs in `openspec/specs/` reflect the shipped state.
 
 Note: the dharma-cms feature (法要管理 + `/dharma` page) was built and then **intentionally removed** (front, admin, and DB) — do not resurrect it; the archived change is history, not a roadmap.
 

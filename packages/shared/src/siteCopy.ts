@@ -117,7 +117,7 @@ export const SITE_COPY = [
     key: 'footer_copyright',
     group: '全站',
     label: 'Footer 版權列',
-    defaultValue: '© 華圓覺苑 HUA YUAN MONASTERY · 南無阿彌陀佛',
+    defaultValue: '© 華圓覺苑 HUA YUAN TEMPLE · 南無阿彌陀佛',
   },
 ] as const satisfies readonly SiteCopyDef[]
 
