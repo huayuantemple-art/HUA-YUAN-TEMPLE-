@@ -33,3 +33,12 @@ test('報名流程:選課 → 表單,驗證擋下不完整送出', async ({ page
   await page.locator('text=← 重新選擇課程').click()
   await expect(page.locator('text=目前開放報名的課程')).toBeVisible()
 })
+
+// 課程頁「報名 →」帶 ?course=<id> 直達表單(課程頁已是列表,不再重選)
+test('課程頁報名直達表單', async ({ page }) => {
+  await page.goto('/course')
+  await page.locator('a.btn-gold', { hasText: '報名 →' }).first().click()
+  await expect(page.locator('text=填寫報名資料')).toBeVisible()
+  // 表單上方顯示已選課程,不經過選課列表
+  await expect(page.locator('.selected-course-box .selected-course-name')).not.toBeEmpty()
+})

@@ -18,6 +18,24 @@ type Step = 'courses' | 'form' | 'done'
 const step = ref<Step>('courses')
 const selectedCourse = ref<Course | null>(null)
 
+// 課程頁「報名 →」帶 ?course=<id> 直達表單(課程頁本身已是課程列表,不必再選一次);
+// 查無該課程或非招生中則照常停留在選課列表
+const route = useRoute()
+watch(
+  courses,
+  (list) => {
+    if (step.value !== 'courses' || selectedCourse.value || !list) return
+    const id = Number(route.query.course)
+    if (!id) return
+    const preselected = list.find((c) => c.id === id && c.status === '招生中')
+    if (preselected) {
+      selectedCourse.value = preselected
+      step.value = 'form'
+    }
+  },
+  { immediate: true },
+)
+
 const form = reactive({ name: '', phone: '', email: '', note: '' })
 const errors = reactive({ name: false, phone: false, email: false, privacy: false })
 const agreePrivacy = ref(false)

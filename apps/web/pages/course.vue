@@ -35,7 +35,7 @@ const list = computed(() => courses.value ?? [])
               }}</span>
               <NuxtLink
                 v-if="c.status === '招生中'"
-                to="/signup"
+                :to="`/signup?course=${c.id}`"
                 class="btn-gold"
                 style="padding: 10px 24px; font-size: 14px"
                 >報名 →</NuxtLink
