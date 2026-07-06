@@ -18,7 +18,7 @@
           letter-spacing: 0.1em;
           cursor: pointer;
         "
-        >← 返回入門佛法</NuxtLink
+        >← 返回法寶略節</NuxtLink
       >
       <h1
         style="

@@ -7,7 +7,7 @@ const menuOpen = ref(false)
 const links = [
   { to: '/', label: '首頁' },
   { to: '/news', label: '最新公告' },
-  { to: '/primer', label: '入門佛法' },
+  { to: '/primer', label: '法寶略節' },
   { to: '/video', label: '法師說法' },
   { to: '/course', label: '課程報名' },
   { to: '/contact', label: '聯絡我們' },

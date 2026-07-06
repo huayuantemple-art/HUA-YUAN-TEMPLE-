@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 // 8.1 前台主要頁面:每頁可開啟且渲染關鍵內容(資料來自 Supabase,證明資料層正常)
 const PAGES: Array<{ path: string; heading: string }> = [
   { path: '/news', heading: '最新公告' },
-  { path: '/primer', heading: '入門佛法' },
+  { path: '/primer', heading: '法寶略節' },
   { path: '/video', heading: '法師說法' },
   { path: '/course', heading: '課程報名' },
   { path: '/contact', heading: '聯絡我們' },

@@ -19,7 +19,7 @@ const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
         <div class="footer-links">
           <NuxtLink to="/">首頁</NuxtLink>
           <NuxtLink to="/news">最新公告</NuxtLink>
-          <NuxtLink to="/primer">入門佛法</NuxtLink>
+          <NuxtLink to="/primer">法寶略節</NuxtLink>
           <NuxtLink to="/video">法師說法</NuxtLink>
           <NuxtLink to="/course">課程報名</NuxtLink>
           <NuxtLink to="/about">關於我們</NuxtLink>

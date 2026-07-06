@@ -112,12 +112,12 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
       </div>
     </div>
 
-    <!-- 入門佛法 -->
+    <!-- 法寶略節 -->
     <div class="sec-bg">
       <div class="sec-bg-inner">
         <div class="center" style="margin-bottom: 46px">
           <div class="sec-en">DHARMA PRIMER</div>
-          <div class="sec-title">入門佛法</div>
+          <div class="sec-title">法寶略節</div>
           <p style="font-size: 15px; color: #8a6f55; margin: 8px 0 0">循序漸進，建立正知正見</p>
         </div>
         <div class="grid3">
