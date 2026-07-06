@@ -24,5 +24,5 @@
 ## 4. 驗證
 
 - [x] 4.1 `pnpm lint && pnpm typecheck && pnpm test && pnpm build:web && pnpm build:admin` 通過
-- [ ] 4.2 RLS:匿名寫入 `site_content` 被拒
-- [ ] 4.3 端到端:後台改一則文案 → 前台 ISR 後更新;清空該值 → 前台回 fallback
+- [x] 4.2 RLS:匿名寫入 `site_content` 被拒
+- [x] 4.3 端到端:後台改一則文案 → 前台 ISR 後更新;清空該值 → 前台回 fallback
