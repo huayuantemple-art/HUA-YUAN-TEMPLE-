@@ -4,6 +4,15 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+/* 藏經缺字字型子集(Jigmo2,CC0;僅含 𠯋 U+20BCB 與 𭈪 U+2D22A 兩字,1.5KB):
+   Noto TC 不含 CJK Ext-B/F,unicode-range 使此字型只命中這兩個碼位、其餘文字不受影響 */
+@font-face {
+  font-family: 'Gaiji';
+  src: url('/fonts/gaiji.woff2') format('woff2');
+  unicode-range: U+20BCB, U+2D22A;
+  font-display: swap;
+}
+
 /* ══ 以下為舊站 index.html <style> 原樣移植(source of truth)══ */
 * {
   box-sizing: border-box;

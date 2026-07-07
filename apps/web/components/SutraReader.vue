@@ -59,7 +59,7 @@ const paragraphs = computed(() =>
           v-for="(paragraph, index) in paragraphs"
           :key="index"
           style="
-            font-family: 'Noto Serif TC', serif;
+            font-family: 'Gaiji', 'Noto Serif TC', serif;
             font-size: 19px;
             line-height: 2.25;
             color: #2a1a16;
