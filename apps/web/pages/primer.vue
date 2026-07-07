@@ -8,7 +8,11 @@ const { data: sutras, pending: sutrasPending } = useLazyAsyncData('sutras', () =
   api.sutras.listPublished(),
 )
 const list = computed(() => docs.value ?? [])
-const readingList = computed(() => sutras.value ?? [])
+// 線上閱讀與下方佛法文檔一一對應(件數/順序/標題一致);
+// 心經無對應 PDF 且有首頁專屬入口(/sutra,同 getHeartSutra 以標題辨識),不列入此清單
+const readingList = computed(() =>
+  (sutras.value ?? []).filter((sutra) => sutra.title !== '般若波羅蜜多心經'),
+)
 
 function documentExtension(filename: string): string {
   return filename.split('.').pop()?.toUpperCase() || '檔案'
