@@ -16,6 +16,29 @@ const ui = useUiStore()
 const { visible, open, openDrawer, closeDrawer } = useDrawer()
 const dialog = useDialog()
 
+// 跑馬燈設定:同「網站文案」的 news_marquee(每行一則;留空＝自動輪播最新公告標題),
+// 在公告管理頁提供入口,管理公告時不必切換模組
+const marquee = useDrawer()
+const marqueeValue = ref('')
+
+function openMarquee() {
+  marqueeValue.value = data.siteContent.find((row) => row.key === 'news_marquee')?.value ?? ''
+  marquee.openDrawer()
+}
+
+async function saveMarquee() {
+  try {
+    await api.siteContent.upsert('news_marquee', marqueeValue.value.trim())
+  } catch (error) {
+    toast('儲存失敗：' + (error as Error).message, true)
+    return
+  }
+  // ISR 60s:明示延遲,管理者不誤判儲存失敗
+  toast('跑馬燈已儲存，前台約一分鐘內更新')
+  marquee.closeDrawer()
+  await data.reloadSiteContent()
+}
+
 const search = ref('')
 const filter = ref('')
 
@@ -165,7 +188,10 @@ onMounted(() => {
           <option>公告</option>
         </select>
       </div>
-      <button class="btn btn-dark" @click="openNew">＋ 新增公告</button>
+      <div class="flex gap-[10px]">
+        <button class="btn btn-outline" @click="openMarquee">跑馬燈設定</button>
+        <button class="btn btn-dark" @click="openNew">＋ 新增公告</button>
+      </div>
     </div>
     <AdminDataTable
       :columns="columns"
@@ -221,6 +247,30 @@ onMounted(() => {
       </div>
       <template #save>
         <button class="btn btn-gold" @click="save">儲存公告</button>
+      </template>
+    </AppDrawer>
+
+    <AppDrawer
+      title="跑馬燈設定"
+      :visible="marquee.visible.value"
+      :open="marquee.open.value"
+      @close="marquee.closeDrawer"
+    >
+      <div class="fr">
+        <label class="lbl">跑馬燈內容(每行一則)</label>
+        <textarea
+          v-model="marqueeValue"
+          class="inp"
+          rows="6"
+          placeholder="留空＝自動輪播最新公告標題"
+        ></textarea>
+      </div>
+      <div class="text-muted" style="font-size: 13px; line-height: 1.9">
+        跑馬燈與月曆內容各自獨立：此處文字只影響前台跑馬燈，不影響月曆。留空時前台自動輪播最新公告標題。與「網站文案
+        &gt; 最新公告」的跑馬燈內容為同一設定。
+      </div>
+      <template #save>
+        <button class="btn btn-gold" @click="saveMarquee">儲存跑馬燈</button>
       </template>
     </AppDrawer>
   </div>
