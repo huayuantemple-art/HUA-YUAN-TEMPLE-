@@ -63,6 +63,8 @@ export interface Sutra {
   translator: string | null
   content: string
   status: SutraStatus
+  /** 對應之佛法文檔(documents.id);null=無對應(如心經),不列入線上閱讀清單 */
+  document_id: number | null
   created_at: string
 }
 

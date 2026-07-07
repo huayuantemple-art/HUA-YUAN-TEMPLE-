@@ -7,12 +7,14 @@ import {
   storageSafeObjectPath,
   type DocumentRow,
   type DocumentStatus,
+  type Sutra,
 } from '@huayuan/shared'
 import AdminDataTable from '../components/AdminDataTable.vue'
 import AppDrawer from '../components/AppDrawer.vue'
 import { useDrawer } from '../composables/useDrawer'
 import { api } from '../lib/api'
 import { badgeClass } from '../lib/badge'
+import { extractDocumentText } from '../lib/docText'
 import { supabase } from '../lib/supabase'
 import { toast } from '../lib/toast'
 import { useDataStore } from '../stores/data'
@@ -50,8 +52,42 @@ const DOCUMENT_FILE_TYPES: Record<string, string> = {
 }
 
 function documentFileExtension(file: File): 'pdf' | 'docx' | null {
-  const extension = file.name.split('.').pop()?.toLowerCase()
+  return filenameExtension(file.name)
+}
+
+function filenameExtension(filename: string): 'pdf' | 'docx' | null {
+  const extension = filename.split('.').pop()?.toLowerCase()
   return extension === 'pdf' || extension === 'docx' ? extension : null
+}
+
+// ── 同步線上閱讀(auto-sync-reading-from-documents)──
+// 保留最近上傳檔的位元組供儲存時抽字;手填檔名(未經上傳按鈕)則自 storage 取檔
+let pendingFileBytes: ArrayBuffer | null = null
+let pendingFileExt: 'pdf' | 'docx' | null = null
+
+function resetPendingFile() {
+  pendingFileBytes = null
+  pendingFileExt = null
+}
+
+async function extractTextForDocument(filename: string): Promise<string> {
+  const extension = pendingFileExt ?? filenameExtension(filename)
+  if (!extension) return ''
+  let bytes = pendingFileBytes
+  if (!bytes) {
+    try {
+      const res = await fetch(pdfUrl(filename))
+      if (!res.ok) return ''
+      bytes = await res.arrayBuffer()
+    } catch {
+      return ''
+    }
+  }
+  return extractDocumentText(bytes, extension)
+}
+
+function linkedSutra(documentId: number): Sutra | undefined {
+  return data.sutras.find((sutra) => sutra.document_id === documentId)
 }
 
 function documentStoragePath(file: File): string {
@@ -80,6 +116,9 @@ async function uploadDocumentFile(event: Event) {
     })
     if (error) throw error
     form.filename = path
+    // 留存位元組,儲存時抽字建立線上閱讀內文
+    pendingFileBytes = await file.arrayBuffer()
+    pendingFileExt = extension
     toast('檔案已上傳')
   } catch (error) {
     toast('上傳失敗：' + (error as Error).message, true)
@@ -92,6 +131,7 @@ async function uploadDocumentFile(event: Event) {
 function openNew() {
   drawerTitle.value = '新增佛法文檔'
   Object.assign(form, { id: null, name: '', description: '', filename: '', status: '草稿' })
+  resetPendingFile()
   openDrawer()
 }
 
@@ -104,6 +144,7 @@ function openEdit(d: DocumentRow) {
     filename: d.filename,
     status: d.status,
   })
+  resetPendingFile()
   openDrawer()
 }
 
@@ -118,22 +159,61 @@ async function save() {
     toast('請填入檔名或上傳檔案', true)
     return
   }
+  const isNew = !form.id
+  let created: DocumentRow | null = null
   try {
     if (form.id) await api.documents.update(form.id, p)
-    else await api.documents.create(p)
+    else created = await api.documents.create(p)
   } catch (error) {
     toast('儲存失敗：' + (error as Error).message, true)
     return
   }
-  toast('文檔已儲存')
+
+  // 同步線上閱讀:失敗不影響已儲存的文檔本體,單獨提示
+  try {
+    if (isNew && created) {
+      const content = await extractTextForDocument(p.filename)
+      const nextSeq = Math.max(0, ...data.sutras.map((sutra) => sutra.seq)) + 1
+      await api.sutras.create({
+        seq: nextSeq,
+        title: p.name,
+        translator: null,
+        content,
+        // 抽字失敗一律草稿,補內文後再發布(不讓空內文上前台)
+        status: content ? p.status : '草稿',
+        document_id: created.id,
+      })
+      toast(
+        content
+          ? '文檔已儲存，線上閱讀已同步'
+          : '文檔已儲存；檔案抽不出文字（可能為掃描檔），線上閱讀已建立草稿，請至經文管理補內文後發布',
+        !content,
+      )
+    } else if (form.id) {
+      const sutra = linkedSutra(form.id)
+      if (sutra) {
+        // 空內文的經文不得因文檔發布而連動發布
+        const nextStatus = p.status === '已發布' && !sutra.content.trim() ? '草稿' : p.status
+        if (sutra.title !== p.name || sutra.status !== nextStatus) {
+          await api.sutras.update(sutra.id, { title: p.name, status: nextStatus })
+        }
+      }
+      toast('文檔已儲存，線上閱讀已同步')
+    }
+  } catch (error) {
+    toast('文檔已儲存，但同步線上閱讀失敗：' + (error as Error).message, true)
+  }
   closeDrawer()
-  await data.reloadDocuments()
+  await Promise.all([data.reloadDocuments(), data.reloadSutras()])
 }
 
 function del(document: DocumentRow) {
+  const sutra = linkedSutra(document.id)
   dialog.warning({
     title: '確認刪除文檔記錄',
-    content: `確定刪除「${document.name}」？Storage 上的 PDF 不受影響。`,
+    content: sutra
+      ? `確定刪除「${document.name}」？將一併刪除對應的線上閱讀經文；Storage 上的檔案不受影響。`
+      : `確定刪除「${document.name}」？Storage 上的 PDF 不受影響。`,
     positiveText: '刪除',
     negativeText: '取消',
     autoFocus: false,
@@ -146,13 +226,18 @@ function del(document: DocumentRow) {
 }
 
 async function removeDocument(id: number) {
+  const sutra = linkedSutra(id)
   try {
     await api.documents.remove(id)
+    // 一併刪除對應經文,維持兩清單一致
+    if (sutra) await api.sutras.remove(sutra.id)
   } catch (error) {
     toast('刪除失敗：' + (error as Error).message, true)
+    await data.reloadSutras()
     return
   }
   data.documents = data.documents.filter((x) => x.id !== id)
+  if (sutra) data.sutras = data.sutras.filter((x) => x.id !== sutra.id)
   toast('已刪除')
 }
 
@@ -298,6 +383,9 @@ onMounted(() => {
           <option>已發布</option>
           <option>草稿</option>
         </select>
+      </div>
+      <div class="text-muted" style="font-size: 13px; line-height: 1.9">
+        儲存後會自動同步「線上閱讀」：新增時自動抽取檔案文字建立經文（掃描檔抽不出文字則建草稿，請至經文管理補內文）；改名、狀態與刪除也會連動。
       </div>
       <template #save>
         <button class="btn btn-gold" @click="save">儲存文檔</button>
