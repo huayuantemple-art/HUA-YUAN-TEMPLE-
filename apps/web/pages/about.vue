@@ -2,7 +2,7 @@
 import { escapeHtml } from '@huayuan/shared'
 
 const api = useApi()
-const { copy, copyHtml } = useSiteCopy()
+const { copyHtml } = useSiteCopy()
 const { data: about } = useLazyAsyncData('about', () => api.about.get())
 
 const defaultValues = [
@@ -59,7 +59,6 @@ const values = computed(() =>
     </div>
     <section class="about-intro">
       <div class="about-copy-panel">
-        <div class="sec-en about-section-kicker">{{ copy('about_kicker') }}</div>
         <!-- eslint-disable vue/no-v-html -- 內容已 escapeHtml,僅插入受控 <br>(同舊站) -->
         <h2 class="about-headline" v-html="headlineHtml"></h2>
         <!-- eslint-enable vue/no-v-html -->

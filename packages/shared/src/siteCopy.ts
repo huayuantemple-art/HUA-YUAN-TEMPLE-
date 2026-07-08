@@ -78,12 +78,6 @@ export const SITE_COPY = [
     multiline: true,
   },
   {
-    key: 'about_kicker',
-    group: '關於我們',
-    label: '關於頁引言(kicker)',
-    defaultValue: '弘揚淨土 持戒念佛',
-  },
-  {
     key: 'primer_banner_quote',
     group: '法寶略節',
     label: '法寶略節 banner 華嚴經引文',

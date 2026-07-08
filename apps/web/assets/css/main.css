@@ -882,9 +882,6 @@ iframe {
   min-width: 0;
   padding: 10px 0;
 }
-.about-section-kicker {
-  margin-bottom: 14px;
-}
 .about-headline {
   font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
   font-weight: 700;
@@ -1316,11 +1313,6 @@ iframe {
   .about-intro {
     padding: 54px 20px 58px !important;
   }
-  .about-section-kicker {
-    font-size: 12px;
-    letter-spacing: 0.3em;
-    margin-bottom: 12px !important;
-  }
   .about-headline {
     color: #3a211c !important;
     font-size: 27px !important;
@@ -1598,9 +1590,6 @@ iframe {
   .about-intro {
     padding-left: 16px !important;
     padding-right: 16px !important;
-  }
-  .about-section-kicker {
-    letter-spacing: 0.24em;
   }
   .about-headline {
     font-size: 25px !important;
