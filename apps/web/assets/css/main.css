@@ -856,14 +856,27 @@ iframe {
 }
 
 /* ABOUT */
+/* 簡介 banner:標題最大字、詩句第三大字,楷體(比照紙本設計) */
+.about-banner h1 {
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+}
+.about-banner p {
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+  font-size: 19px;
+  letter-spacing: 0.18em;
+  line-height: 2.1;
+}
+
+/* 簡介改置中單欄(比照紙本設計:所有文字置於版面中間,字級由大至小分層) */
 .about-intro {
-  max-width: 1120px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 76px 40px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-  gap: 56px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 48px;
 }
 .about-copy-panel {
   min-width: 0;
@@ -873,24 +886,38 @@ iframe {
   margin-bottom: 14px;
 }
 .about-headline {
-  font-family: 'Noto Serif TC', serif;
-  font-weight: 500;
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+  font-weight: 700;
   font-size: 34px;
   line-height: 1.55;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: #3a211c;
-  margin: 0 0 24px;
+  margin: 0 0 22px;
 }
-.about-copy {
+.about-motto {
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 2.1;
+  letter-spacing: 0.2em;
+  color: #4a3527;
+  margin: 0 0 30px;
+}
+.about-paragraphs p {
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
   max-width: 620px;
   color: #6b5a48;
-  font-size: 15px;
-  line-height: 2.15;
-  letter-spacing: 0.03em;
-  margin: 0;
+  font-size: 16px;
+  line-height: 2.2;
+  letter-spacing: 0.06em;
+  margin: 0 auto 18px;
+}
+.about-paragraphs p:last-child {
+  margin-bottom: 0;
 }
 .about-photo {
   width: 100%;
+  max-width: 680px;
   aspect-ratio: 5/4;
   object-fit: cover;
   display: flex;
@@ -1281,8 +1308,8 @@ iframe {
     line-height: 1.45;
   }
   .about-banner p {
-    font-size: 15px;
-    letter-spacing: 0.06em;
+    font-size: 16px;
+    letter-spacing: 0.1em;
     line-height: 2;
     margin-top: 18px;
   }
@@ -1293,19 +1320,20 @@ iframe {
     font-size: 12px;
     letter-spacing: 0.3em;
     margin-bottom: 12px !important;
-    text-align: left;
   }
   .about-headline {
     color: #3a211c !important;
     font-size: 27px !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: 0.1em !important;
     line-height: 1.65 !important;
-    margin-bottom: 22px !important;
-    text-align: left;
+    margin-bottom: 20px !important;
   }
-  .about-copy {
-    color: #6b5a48 !important;
-    font-size: 16px !important;
+  .about-motto {
+    font-size: 18px !important;
+    letter-spacing: 0.14em !important;
+  }
+  .about-paragraphs p {
+    font-size: 15px !important;
     line-height: 2.25 !important;
   }
   .about-photo {
@@ -1577,9 +1605,11 @@ iframe {
   .about-headline {
     font-size: 25px !important;
   }
-  .about-copy {
-    font-size: 15px !important;
-    line-height: 2.2 !important;
+  .about-motto {
+    font-size: 17px !important;
+  }
+  .about-paragraphs p {
+    font-size: 14.5px !important;
   }
   .hero-pad {
     padding-left: 16px !important;

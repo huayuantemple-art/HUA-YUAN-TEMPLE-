@@ -25,7 +25,15 @@ const defaultValues = [
 
 // 同舊站:headline 逃逸後將全形空白換成 <br>(僅插入受控標籤,內容已逃逸)
 const headlineHtml = computed(() => escapeHtml(about.value?.headline || '').replace('　', '<br>'))
-const contentHtml = computed(() => escapeHtml(about.value?.content || '').replace(/\n/g, '<br>'))
+// 內文分層(比照紙本設計):無句號的短句為標語行(第三大字),含句號者為內文段落(最小字)
+const contentLines = computed(() =>
+  (about.value?.content || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
+const mottoLines = computed(() => contentLines.value.filter((line) => !line.includes('。')))
+const paragraphs = computed(() => contentLines.value.filter((line) => line.includes('。')))
 const aboutImageUrl = computed(() => about.value?.image_url?.trim() || '')
 
 const values = computed(() =>
@@ -54,8 +62,13 @@ const values = computed(() =>
         <div class="sec-en about-section-kicker">{{ copy('about_kicker') }}</div>
         <!-- eslint-disable vue/no-v-html -- 內容已 escapeHtml,僅插入受控 <br>(同舊站) -->
         <h2 class="about-headline" v-html="headlineHtml"></h2>
-        <!-- eslint-disable vue/no-v-html -- DB 文字已 escapeHtml,僅保留換行 -->
-        <p class="about-copy" v-html="contentHtml"></p>
+        <!-- eslint-enable vue/no-v-html -->
+        <div v-if="mottoLines.length" class="about-motto">
+          <div v-for="(line, i) in mottoLines" :key="i">{{ line }}</div>
+        </div>
+        <div class="about-paragraphs">
+          <p v-for="(paragraph, i) in paragraphs" :key="i">{{ paragraph }}</p>
+        </div>
       </div>
       <div
         v-if="!aboutImageUrl"
