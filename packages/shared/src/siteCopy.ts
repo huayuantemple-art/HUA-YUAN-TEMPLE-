@@ -29,22 +29,21 @@ export const SITE_COPY = [
   {
     key: 'home_hero_kicker',
     group: '首頁',
-    label: '首頁 hero 引文(金色小字)',
-    defaultValue: '諸佛唯一大事因緣出現於世\n開佛知見 示佛知見 悟佛知見 入佛知見',
+    label: '首頁 hero 引文(第一行帶金線,其餘行列於下方)',
+    defaultValue: '諸佛唯一大事因緣出現於世\n開佛知見　示佛知見\n悟佛知見　入佛知見',
     multiline: true,
   },
   {
     key: 'home_hero_title',
     group: '首頁',
-    label: '首頁 hero 主標詩句',
-    defaultValue: '佛身真金色 圓光遍一尋',
+    label: '首頁 hero 主標',
+    defaultValue: '諸佛皆共讚歎阿彌陀佛',
   },
   {
     key: 'home_hero_verse',
     group: '首頁',
-    label: '首頁 hero 詩句',
-    defaultValue:
-      '永斷眾煩惱 超度生死流 如是大導師 能調伏一切\n眾生咸蒙化 故號為真濟 汝今宜速往 詣彼世尊所',
+    label: '首頁 hero 偈頌(每行一句)',
+    defaultValue: '念阿彌陀佛為開\n其佛本願力為示\n聞名欲往生為悟\n自致不退轉為入',
     multiline: true,
   },
   {

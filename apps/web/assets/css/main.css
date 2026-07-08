@@ -1347,6 +1347,10 @@ iframe {
     letter-spacing: 0.08em !important;
     line-height: 2.25;
   }
+  .hero-kicker-sub {
+    font-size: 16px !important;
+    letter-spacing: 0.16em !important;
+  }
   .hero-btns .btn-outline {
     display: none;
   }
@@ -1590,6 +1594,10 @@ iframe {
   .hero-kicker-text {
     font-size: 17px !important;
     letter-spacing: 0.04em !important;
+  }
+  .hero-kicker-sub {
+    font-size: 15px !important;
+    letter-spacing: 0.1em !important;
   }
   .dharma-card {
     padding: 28px 22px;

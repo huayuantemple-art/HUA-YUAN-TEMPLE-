@@ -1,6 +1,20 @@
 <script setup lang="ts">
 const api = useApi()
-const { copy, copyHtml } = useSiteCopy()
+const { copy } = useSiteCopy()
+
+// hero 版式(比照紙本設計):引文第一行帶金線,其餘行(佛知見)列於下方;偈頌逐行置中
+const kickerLines = computed(() =>
+  copy('home_hero_kicker')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
+const verseLines = computed(() =>
+  copy('home_hero_verse')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
 const { data: ann, pending: annPending } = useLazyAsyncData('announcements', () =>
   api.announcements.listPublished(),
 )
@@ -27,51 +41,68 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
     >
       <div
         class="hero-kicker"
-        style="display: inline-flex; align-items: center; gap: 14px; margin-bottom: 26px"
+        style="display: inline-flex; align-items: center; gap: 14px; margin-bottom: 20px"
       >
         <span
           class="hero-kicker-line"
           style="width: 50px; height: 1px; background: #c9a24b"
         ></span>
-        <!-- eslint-disable vue/no-v-html -- copyHtml 已 escapeHtml,僅換行轉受控 <br> -->
         <span
           class="hero-kicker-text"
-          style="font-size: 13px; letter-spacing: 0.4em; color: #c9a24b"
-          v-html="copyHtml('home_hero_kicker')"
-        ></span>
-        <!-- eslint-enable vue/no-v-html -->
-
+          style="
+            font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+            font-size: 16px;
+            letter-spacing: 0.32em;
+            color: #c9a24b;
+          "
+          >{{ kickerLines[0] }}</span
+        >
         <span
           class="hero-kicker-line"
           style="width: 50px; height: 1px; background: #c9a24b"
         ></span>
       </div>
+      <div
+        v-if="kickerLines.length > 1"
+        class="hero-kicker-sub"
+        style="
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-size: 18px;
+          letter-spacing: 0.3em;
+          line-height: 2.2;
+          color: #e6d5ae;
+          margin-bottom: 8px;
+        "
+      >
+        <div v-for="(line, i) in kickerLines.slice(1)" :key="i">{{ line }}</div>
+      </div>
       <h1
         class="hero-title"
         style="
-          font-family: 'Noto Serif TC', serif;
-          font-weight: 500;
-          font-size: 60px;
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-weight: 700;
+          font-size: 56px;
           line-height: 1.5;
-          margin: 0 0 24px;
-          letter-spacing: 0.08em;
+          margin: 0 0 20px;
+          letter-spacing: 0.1em;
         "
       >
         {{ copy('home_hero_title') }}
       </h1>
-      <!-- eslint-disable vue/no-v-html -- copyHtml 已 escapeHtml,僅換行轉受控 <br> -->
-      <p
+      <div
         class="hero-verse"
         style="
-          font-size: 16px;
-          line-height: 2.1;
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-size: 20px;
+          line-height: 2.25;
+          letter-spacing: 0.14em;
           color: #d9c8a6;
           max-width: 580px;
           margin: 0 auto 40px;
         "
-        v-html="copyHtml('home_hero_verse')"
-      ></p>
-      <!-- eslint-enable vue/no-v-html -->
+      >
+        <div v-for="(line, i) in verseLines" :key="i">{{ line }}</div>
+      </div>
       <div class="hero-btns" style="display: flex; gap: 16px; justify-content: center">
         <button class="btn-gold" @click="navigateTo('/course')">立即報名課程</button>
         <button
