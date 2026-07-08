@@ -33,7 +33,18 @@ const contentLines = computed(() =>
     .filter(Boolean),
 )
 const mottoLines = computed(() => contentLines.value.filter((line) => !line.includes('。')))
-const paragraphs = computed(() => contentLines.value.filter((line) => line.includes('。')))
+// 段落再依句號斷句:一個句號視為一句,每句獨立一行置中
+const paragraphs = computed(() =>
+  contentLines.value
+    .filter((line) => line.includes('。'))
+    .map((line) =>
+      line
+        .split('。')
+        .map((sentence) => sentence.trim())
+        .filter(Boolean)
+        .map((sentence) => sentence + '。'),
+    ),
+)
 // 輪播照片:image_urls 為主,空時退回舊單張欄位 image_url
 const aboutPhotos = computed(() => {
   const urls = (about.value?.image_urls ?? []).map((url) => url.trim()).filter(Boolean)
@@ -72,7 +83,11 @@ const values = computed(() =>
           <div v-for="(line, i) in mottoLines" :key="i">{{ line }}</div>
         </div>
         <div class="about-paragraphs">
-          <p v-for="(paragraph, i) in paragraphs" :key="i">{{ paragraph }}</p>
+          <p v-for="(sentences, i) in paragraphs" :key="i">
+            <span v-for="(sentence, j) in sentences" :key="j" class="about-sentence">{{
+              sentence
+            }}</span>
+          </p>
         </div>
       </div>
       <div

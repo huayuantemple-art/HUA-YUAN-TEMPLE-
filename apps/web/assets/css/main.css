@@ -912,6 +912,10 @@ iframe {
 .about-paragraphs p:last-child {
   margin-bottom: 0;
 }
+/* 一個句號一句,每句獨立一行 */
+.about-sentence {
+  display: block;
+}
 /* 照片輪播(單一相框,沿用 .about-photo 尺寸邊框) */
 .photo-carousel {
   position: relative;
