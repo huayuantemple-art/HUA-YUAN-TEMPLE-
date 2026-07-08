@@ -81,6 +81,7 @@ const values = computed(() =>
         :src="aboutImageUrl"
         alt="道場意境照片"
       />
+      <img class="about-photo" src="/images/about-altar.jpg" alt="大殿三寶佛" loading="lazy" />
     </section>
     <section class="about-values">
       <div class="about-values-inner">
