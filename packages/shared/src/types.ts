@@ -72,7 +72,10 @@ export interface About {
   id: number
   headline: string | null
   content: string | null
+  /** 舊單張照片欄位;image_urls 為空時的前台後備 */
   image_url: string | null
+  /** 輪播照片網址陣列(順序即輪播順序);空時前台退回 image_url */
+  image_urls: string[] | null
   value1: string | null
   value1_desc: string | null
   value2: string | null

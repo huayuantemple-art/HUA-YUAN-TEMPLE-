@@ -912,6 +912,47 @@ iframe {
 .about-paragraphs p:last-child {
   margin-bottom: 0;
 }
+/* 照片輪播(單一相框,沿用 .about-photo 尺寸邊框) */
+.photo-carousel {
+  position: relative;
+  overflow: hidden;
+}
+.photo-carousel-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.photo-carousel-img.active {
+  opacity: 1;
+}
+.photo-carousel-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 1;
+}
+.photo-carousel-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #c9a24b;
+  background: rgba(58, 33, 28, 0.35);
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.photo-carousel-dot.active {
+  background: #c9a24b;
+}
+
 .about-photo {
   width: 100%;
   max-width: 680px;

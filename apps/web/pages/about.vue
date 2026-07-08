@@ -34,7 +34,13 @@ const contentLines = computed(() =>
 )
 const mottoLines = computed(() => contentLines.value.filter((line) => !line.includes('。')))
 const paragraphs = computed(() => contentLines.value.filter((line) => line.includes('。')))
-const aboutImageUrl = computed(() => about.value?.image_url?.trim() || '')
+// 輪播照片:image_urls 為主,空時退回舊單張欄位 image_url
+const aboutPhotos = computed(() => {
+  const urls = (about.value?.image_urls ?? []).map((url) => url.trim()).filter(Boolean)
+  if (urls.length) return urls
+  const single = about.value?.image_url?.trim()
+  return single ? [single] : []
+})
 
 const values = computed(() =>
   defaultValues.map((fallback, index) => {
@@ -70,18 +76,12 @@ const values = computed(() =>
         </div>
       </div>
       <div
-        v-if="!aboutImageUrl"
+        v-if="!aboutPhotos.length"
         class="about-photo"
       >
         道場意境照片
       </div>
-      <img
-        v-else
-        class="about-photo"
-        :src="aboutImageUrl"
-        alt="道場意境照片"
-      />
-      <img class="about-photo" src="/images/about-altar.jpg" alt="大殿三寶佛" loading="lazy" />
+      <PhotoCarousel v-else :photos="aboutPhotos" alt="道場照片" />
     </section>
     <section class="about-values">
       <div class="about-values-inner">

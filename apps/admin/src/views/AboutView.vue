@@ -7,7 +7,8 @@ import { toast } from '../lib/toast'
 const form = reactive({
   headline: '',
   content: '',
-  image_url: '',
+  // 輪播照片清單(順序即前台輪播順序)
+  image_urls: [] as string[],
   value1: '',
   value1_desc: '',
   value2: '',
@@ -23,7 +24,7 @@ onMounted(async () => {
   Object.assign(form, {
     headline: row.headline ?? '',
     content: row.content ?? '',
-    image_url: row.image_url ?? '',
+    image_urls: row.image_urls ?? (row.image_url ? [row.image_url] : []),
     value1: row.value1 ?? '',
     value1_desc: row.value1_desc ?? '',
     value2: row.value2 ?? '',
@@ -41,8 +42,10 @@ async function uploadImage(event: Event) {
 
   uploadingImage.value = true
   try {
-    form.image_url = await uploadSiteImage(file, 'about-image', 'photo')
-    toast('意境照片已上傳，請儲存變更')
+    // 多張照片用唯一 key(不可共用固定 key 覆寫)
+    const url = await uploadSiteImage(file, `about-${Date.now()}`, 'photo')
+    form.image_urls.push(url)
+    toast('照片已上傳，請儲存變更')
   } catch (error) {
     toast('上傳失敗：' + (error as Error).message, true)
   } finally {
@@ -50,9 +53,20 @@ async function uploadImage(event: Event) {
   }
 }
 
+function removePhoto(index: number) {
+  form.image_urls.splice(index, 1)
+}
+
+function movePhotoUp(index: number) {
+  if (index === 0) return
+  const [photo] = form.image_urls.splice(index, 1)
+  if (photo) form.image_urls.splice(index - 1, 0, photo)
+}
+
 async function save() {
   try {
-    await api.about.upsert({ ...form, image_url: form.image_url || null })
+    // 第一張同步寫回舊欄位 image_url(相容後備)
+    await api.about.upsert({ ...form, image_url: form.image_urls[0] ?? null })
   } catch {
     toast('儲存失敗', true)
     return
@@ -66,20 +80,34 @@ async function save() {
     <div class="card card-pad mb-2">
       <div class="sec-title mb-3">道場簡介</div>
       <div class="fr">
-        <label class="lbl">意境照片</label>
-        <div class="image-field">
-          <div v-if="form.image_url" class="image-thumb image-thumb-photo">
-            <img :src="form.image_url" alt="" />
+        <label class="lbl">照片輪播（依序輪播，可上移調整順序）</label>
+        <div v-if="!form.image_urls.length" class="image-placeholder mb-2">尚無照片</div>
+        <div
+          v-for="(url, i) in form.image_urls"
+          :key="url"
+          class="flex items-center gap-[12px] mb-2"
+        >
+          <div class="image-thumb image-thumb-photo">
+            <img :src="url" alt="" />
           </div>
-          <div v-else class="image-placeholder">道場意境照片</div>
-          <div class="image-actions">
-            <input type="file" class="inp" accept="image/*" @change="uploadImage" />
-            <button class="btn btn-outline btn-sm" type="button" @click="form.image_url = ''">
-              清除照片
+          <div class="flex gap-[8px]">
+            <button
+              class="btn btn-outline btn-sm"
+              type="button"
+              :disabled="i === 0"
+              @click="movePhotoUp(i)"
+            >
+              ↑ 上移
             </button>
-            <div class="text-muted" style="font-size: 12px">
-              {{ uploadingImage ? '上傳中…' : '自動壓縮為長邊 1600px' }}
-            </div>
+            <button class="btn btn-outline btn-sm" type="button" @click="removePhoto(i)">
+              刪除
+            </button>
+          </div>
+        </div>
+        <div class="image-actions">
+          <input type="file" class="inp" accept="image/*" @change="uploadImage" />
+          <div class="text-muted" style="font-size: 12px">
+            {{ uploadingImage ? '上傳中…' : '新增照片：自動壓縮為長邊 1600px；儲存後生效' }}
           </div>
         </div>
       </div>
