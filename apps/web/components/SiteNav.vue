@@ -12,6 +12,7 @@ const links = [
   { to: '/course', label: '課程報名' },
   { to: '/contact', label: '聯絡我們' },
   { to: '/about', label: '關於我們' },
+  { to: '/value', label: '人生的價值' },
 ]
 </script>
 
