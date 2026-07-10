@@ -16,7 +16,7 @@ const NAV_CONTENT = [
   { name: 'announcements', icon: '✦', label: '最新公告' },
   { name: 'courses', icon: '✎', label: '課程管理' },
   { name: 'registrations', icon: '✓', label: '報名資料' },
-  { name: 'questions', icon: '?', label: '學員提問' },
+  { name: 'questions', icon: '?', label: '問題提問' },
   { name: 'videos', icon: '▷', label: '法師說法' },
   { name: 'documents', icon: '▤', label: '佛法文檔' },
   { name: 'sutras', icon: '經', label: '經文管理' },

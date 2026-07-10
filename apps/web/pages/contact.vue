@@ -6,7 +6,7 @@ import defaultContactIconUrl from '~/assets/img/huayuan-logo.png'
 const api = useApi()
 const { data: contact, pending } = useLazyAsyncData('contact', () => api.contact.get())
 
-// 學員提問表單:姓名與內容必填,聯絡方式選填;送出只寫入(return=minimal),不讀回
+// 問題提問表單:姓名與內容必填,聯絡方式選填;送出只寫入(return=minimal),不讀回
 const qForm = reactive({ name: '', contact: '', message: '' })
 const qSubmitting = ref(false)
 const qDone = ref(false)
@@ -150,9 +150,12 @@ function venues(row: Contact | null) {
         </section>
       </template>
 
-      <section class="contact-section">
-        <h2 class="contact-section-title">學員提問</h2>
-        <p class="contact-form-intro">有任何問題，歡迎留言，我們會盡快與您聯繫。</p>
+      <section class="contact-section contact-question">
+        <div class="contact-question-head">
+          <h2 class="contact-question-title">問題提問</h2>
+          <div class="contact-question-rule"></div>
+          <p class="contact-question-intro">有任何問題，歡迎留言，我們會盡快與您聯繫。</p>
+        </div>
         <div v-if="qDone" class="contact-form-done">
           已收到您的提問，我們會盡快與您聯繫。感恩！
         </div>

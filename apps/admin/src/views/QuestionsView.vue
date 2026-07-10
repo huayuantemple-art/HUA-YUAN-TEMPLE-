@@ -93,7 +93,7 @@ const columns: DataTableColumns<ContactMessage> = [
       :loading="loading"
       item-label="提問"
       count-unit="則"
-      empty-text="尚無學員提問"
+      empty-text="尚無問題提問"
     />
   </div>
 </template>

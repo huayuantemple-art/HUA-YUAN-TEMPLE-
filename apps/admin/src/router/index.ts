@@ -40,7 +40,7 @@ export const router = createRouter({
           path: 'questions',
           name: 'questions',
           component: () => import('../views/QuestionsView.vue'),
-          meta: { title: '學員提問' },
+          meta: { title: '問題提問' },
         },
         {
           path: 'videos',

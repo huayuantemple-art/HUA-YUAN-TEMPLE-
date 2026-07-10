@@ -1956,14 +1956,37 @@ iframe {
   }
 }
 
-/* 聯絡頁:學員提問表單 */
+/* 聯絡頁:問題提問表單 */
 .contact-form-intro {
   font-size: 14px;
   color: #8a6f55;
   margin: 0 0 22px;
 }
+.contact-question-head {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.contact-question-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 26px;
+  color: #2a1a16;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+.contact-question-rule {
+  width: 48px;
+  height: 2px;
+  background: #c9a24b;
+  margin: 12px auto 14px;
+}
+.contact-question-intro {
+  font-size: 14px;
+  color: #8a6f55;
+  margin: 0;
+}
 .contact-form {
-  max-width: 540px;
+  max-width: 620px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -2004,7 +2027,7 @@ textarea.contact-input {
   color: #b8442e;
 }
 .contact-submit {
-  align-self: flex-start;
+  align-self: center;
   background: #c9a24b;
   color: #3a211c;
   border: none;
@@ -2024,7 +2047,9 @@ textarea.contact-input {
   cursor: default;
 }
 .contact-form-done {
-  max-width: 540px;
+  max-width: 620px;
+  margin: 0 auto;
+  text-align: center;
   background: #fffdf8;
   border: 1px solid rgba(201, 162, 75, 0.4);
   border-left: 4px solid #c9a24b;
