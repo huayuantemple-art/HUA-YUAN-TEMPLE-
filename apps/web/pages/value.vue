@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 人生的價值頁:內容來自後台「網站文案」;此頁需 shared 的 life_value_* 文案 key。
 const { copy } = useSiteCopy()
 
 // 開頭引言:固定顯示,每行一句
@@ -23,6 +24,15 @@ const sections = computed(() =>
     })
     .filter((section) => section.heading),
 )
+
+// 頁尾聯絡區塊:文字每行一句;LINE 網址存在時顯示 QR 圖(可掃描/點擊)
+const contactLines = computed(() =>
+  copy('life_value_contact')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
+const lineUrl = computed(() => copy('life_value_line_url').trim())
 </script>
 
 <template>
@@ -51,6 +61,22 @@ const sections = computed(() =>
             <p v-for="(para, j) in section.paragraphs" :key="j">{{ para }}</p>
           </div>
         </details>
+      </div>
+
+      <div v-if="contactLines.length || lineUrl" class="value-contact">
+        <div v-if="contactLines.length" class="value-contact-text">
+          <p v-for="(line, i) in contactLines" :key="i">{{ line }}</p>
+        </div>
+        <a
+          v-if="lineUrl"
+          class="value-contact-line"
+          :href="lineUrl"
+          target="_blank"
+          rel="noopener"
+        >
+          <img :src="lineUrl" alt="LINE 官方帳號 QR Code" loading="lazy" />
+          <span>掃描或點擊加入 LINE</span>
+        </a>
       </div>
     </section>
   </div>
