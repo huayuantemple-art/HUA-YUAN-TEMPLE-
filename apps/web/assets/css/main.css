@@ -709,6 +709,18 @@ iframe {
   padding: 13px 0;
   animation: marquee 34s linear infinite;
 }
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 30px;
+  color: #f2e4c8;
+  font-size: 15px;
+}
+.marquee-diamond {
+  color: #c9a24b;
+  font-size: 10px;
+}
 
 /* FILTERS */
 .filters {
@@ -1231,6 +1243,80 @@ iframe {
   line-height: 1.9;
   margin: 0;
 }
+
+/* NEWS LIST(最新公告列表檢視,取代月曆) */
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.news-list-item {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  padding: 22px 26px;
+  background: #fffdf8;
+  border: 1px solid rgba(201, 162, 75, 0.3);
+  border-left: 4px solid #c9a24b;
+  transition: background 0.2s;
+}
+.news-list-item:hover {
+  background: #fff8ee;
+}
+.news-list-meta {
+  flex-shrink: 0;
+  width: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.news-list-date {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 14px;
+  color: #b8893a;
+  letter-spacing: 0.04em;
+}
+.news-list-tag {
+  font-size: 12px;
+  padding: 3px 12px;
+  background: #3a211c;
+  color: #c9a24b;
+}
+.news-list-body {
+  flex: 1;
+  min-width: 0;
+}
+.news-list-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 19px;
+  color: #2a1a16;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.news-list-content {
+  font-size: 14px;
+  color: #8a6f55;
+  line-height: 1.9;
+  margin: 0;
+  white-space: pre-wrap;
+}
+@media (max-width: 768px) {
+  .news-list-item {
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 18px;
+  }
+  .news-list-meta {
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+    gap: 12px;
+  }
+  .news-list-title {
+    font-size: 17px;
+  }
+}
 @media (max-width: 768px) {
   .news-cal-title {
     font-size: 20px;
@@ -1722,5 +1808,105 @@ iframe {
   .sutra-card,
   .sutra-quote {
     padding: 24px 18px;
+  }
+}
+
+/* THE VALUE OF LIFE(人生的價值,可展開手風琴) */
+.value-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 56px 40px 88px;
+}
+.value-intro {
+  text-align: center;
+  font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+  color: #5a3f30;
+  margin-bottom: 44px;
+}
+.value-intro p {
+  font-size: 18px;
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+  margin: 0 0 6px;
+}
+.value-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.value-acc-item {
+  background: #fffdf8;
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  border-left: 4px solid #c9a24b;
+}
+.value-acc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 24px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.value-acc-head::-webkit-details-marker {
+  display: none;
+}
+.value-acc-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 19px;
+  color: #2a1a16;
+  line-height: 1.5;
+}
+.value-acc-icon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b8893a;
+  font-size: 20px;
+  border: 1px solid rgba(201, 162, 75, 0.5);
+  transition: transform 0.2s;
+}
+.value-acc-icon::before {
+  content: '＋';
+  line-height: 1;
+}
+.value-acc-item[open] .value-acc-icon::before {
+  content: '－';
+}
+.value-acc-item[open] .value-acc-head {
+  border-bottom: 1px solid rgba(201, 162, 75, 0.25);
+}
+.value-acc-body {
+  padding: 8px 24px 26px;
+}
+.value-acc-body p {
+  font-size: 15px;
+  line-height: 2;
+  color: #5a4636;
+  letter-spacing: 0.02em;
+  margin: 0 0 14px;
+}
+.value-acc-body p:last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 768px) {
+  .value-page {
+    padding: 40px 20px 64px;
+  }
+  .value-intro p {
+    font-size: 16px;
+  }
+  .value-acc-head {
+    padding: 16px 18px;
+  }
+  .value-acc-title {
+    font-size: 17px;
+  }
+  .value-acc-body {
+    padding: 6px 18px 22px;
   }
 }
