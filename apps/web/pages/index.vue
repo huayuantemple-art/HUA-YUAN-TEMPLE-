@@ -115,6 +115,9 @@ const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
       </div>
     </div>
 
+    <!-- 跑馬燈:與最新公告頁共用同一元件,內容一致 -->
+    <NewsMarquee :announcements="ann ?? []" />
+
     <!-- 最新公告 -->
     <div class="sec">
       <div class="sec-head">
