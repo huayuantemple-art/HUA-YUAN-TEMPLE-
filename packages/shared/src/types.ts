@@ -127,3 +127,18 @@ export interface Registration {
 
 /** 匿名報名時寫入的欄位 */
 export type NewRegistration = Omit<Registration, 'id' | 'created_at'>
+
+export type ContactMessageStatus = '未回覆' | '已回覆'
+
+/** 學員提問(聯絡頁表單→contact_messages) */
+export interface ContactMessage {
+  id: number
+  name: string
+  contact: string | null
+  message: string
+  status: ContactMessageStatus
+  created_at: string
+}
+
+/** 匿名提問時寫入的欄位 */
+export type NewContactMessage = Pick<ContactMessage, 'name' | 'contact' | 'message'>
