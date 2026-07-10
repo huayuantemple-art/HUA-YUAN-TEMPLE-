@@ -8,6 +8,8 @@ import type {
   DocumentRow,
   NewRegistration,
   Registration,
+  ContactMessage,
+  NewContactMessage,
   Sutra,
   Video,
 } from '../types'
@@ -84,6 +86,7 @@ export function createApi(options: ApiOptions) {
   const documents = tableRepo<DocumentRow>(http, 'documents')
   const sutras = tableRepo<Sutra>(http, 'sutras')
   const registrationsBase = tableRepo<Registration>(http, 'registrations')
+  const contactMessagesBase = tableRepo<ContactMessage>(http, 'contact_messages')
 
   return {
     http,
@@ -162,6 +165,20 @@ export function createApi(options: ApiOptions) {
        */
       async create(row: NewRegistration): Promise<void> {
         await http.post('/registrations', row, { headers: { Prefer: 'return=minimal' } })
+      },
+    },
+    contactMessages: {
+      /** 後台:檢視提問(RLS 僅 admin 可讀),新→舊 */
+      listAll: () => contactMessagesBase.list({ order: 'created_at.desc' }),
+      /** 後台:標記回覆狀態 */
+      update: (id: number, patch: Partial<ContactMessage>) =>
+        contactMessagesBase.update(id, patch),
+      /**
+       * 匿名提問:return=minimal — anon 依 RLS 無 SELECT 權限,
+       * 要求 representation 會被拒(42501)
+       */
+      async create(row: NewContactMessage): Promise<void> {
+        await http.post('/contact_messages', row, { headers: { Prefer: 'return=minimal' } })
       },
     },
   }
