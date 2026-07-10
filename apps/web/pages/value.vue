@@ -69,14 +69,12 @@ const lineUrl = computed(() => copy('life_value_line_url').trim())
         </div>
         <a
           v-if="lineUrl"
-          class="value-contact-line"
+          class="value-line-btn"
           :href="lineUrl"
           target="_blank"
           rel="noopener"
+          >加入 LINE 好友</a
         >
-          <img :src="lineUrl" alt="LINE 官方帳號 QR Code" loading="lazy" />
-          <span>掃描或點擊加入 LINE</span>
-        </a>
       </div>
     </section>
   </div>

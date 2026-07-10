@@ -161,8 +161,8 @@ export const SITE_COPY = [
   {
     key: 'life_value_line_url',
     group: '人生的價值',
-    label: 'LINE 官方帳號 QR / 加入好友網址（留空則不顯示）',
-    defaultValue: 'https://qr-official.line.me/gs/M_422dmoex_GW.png?oat_content=qr',
+    label: 'LINE 加入好友連結（留空則不顯示按鈕）',
+    defaultValue: 'https://lin.ee/8qiJdDW',
   },
 ] as const satisfies readonly SiteCopyDef[]
 

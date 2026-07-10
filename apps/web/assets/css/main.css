@@ -1926,33 +1926,28 @@ iframe {
   letter-spacing: 0.04em;
   margin: 0 0 4px;
 }
-.value-contact-line {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+.value-line-btn {
+  display: inline-block;
   margin-top: 18px;
-  text-decoration: none;
-  color: #c9a24b;
-}
-.value-contact-line img {
-  width: 160px;
-  height: 160px;
-  background: #fff;
-  padding: 8px;
+  background: transparent;
+  color: #d9b871;
+  border: 1.5px solid #c9a24b;
+  padding: 12px 34px;
   border-radius: 6px;
+  text-decoration: none;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
-.value-contact-line span {
-  font-size: 13px;
-  letter-spacing: 0.06em;
+.value-line-btn:hover {
+  background: #c9a24b;
+  color: #3a211c;
 }
 @media (max-width: 768px) {
   .value-contact {
     padding: 24px 18px;
-  }
-  .value-contact-line img {
-    width: 140px;
-    height: 140px;
   }
 }
 
