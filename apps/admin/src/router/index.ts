@@ -37,6 +37,12 @@ export const router = createRouter({
           meta: { title: '報名資料' },
         },
         {
+          path: 'questions',
+          name: 'questions',
+          component: () => import('../views/QuestionsView.vue'),
+          meta: { title: '學員提問' },
+        },
+        {
           path: 'videos',
           name: 'videos',
           component: () => import('../views/VideosView.vue'),
