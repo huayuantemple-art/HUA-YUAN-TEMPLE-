@@ -1,0 +1,201 @@
+<script setup lang="ts">
+const api = useApi()
+const { copy } = useSiteCopy()
+
+// hero 版式(比照紙本設計):引文第一行帶金線,其餘行(佛知見)列於下方;偈頌逐行置中
+const kickerLines = computed(() =>
+  copy('home_hero_kicker')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
+const verseLines = computed(() =>
+  copy('home_hero_verse')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean),
+)
+const { data: ann, pending: annPending } = useLazyAsyncData('announcements', () =>
+  api.announcements.listPublished(),
+)
+const { data: videos, pending: vidPending } = useLazyAsyncData('videos', () =>
+  api.videos.listPublished(),
+)
+
+// 同舊站:首頁公告取前 3 筆、影音取前 2 筆
+const homeNews = computed(() => (ann.value ?? []).slice(0, 3))
+const homeVideos = computed(() => (videos.value ?? []).slice(0, 2))
+</script>
+
+<template>
+  <div>
+    <!-- Hero -->
+    <div
+      class="hero-pad"
+      style="
+        padding: 96px 56px 92px;
+        background: linear-gradient(180deg, #4a2a22, #3a211c);
+        color: #f7efd9;
+        text-align: center;
+      "
+    >
+      <div
+        class="hero-kicker"
+        style="display: inline-flex; align-items: center; gap: 14px; margin-bottom: 20px"
+      >
+        <span
+          class="hero-kicker-line"
+          style="width: 50px; height: 1px; background: #c9a24b"
+        ></span>
+        <span
+          class="hero-kicker-text"
+          style="
+            font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+            font-size: 16px;
+            letter-spacing: 0.32em;
+            color: #c9a24b;
+          "
+          >{{ kickerLines[0] }}</span
+        >
+        <span
+          class="hero-kicker-line"
+          style="width: 50px; height: 1px; background: #c9a24b"
+        ></span>
+      </div>
+      <div
+        v-if="kickerLines.length > 1"
+        class="hero-kicker-sub"
+        style="
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-size: 18px;
+          letter-spacing: 0.3em;
+          line-height: 2.2;
+          color: #e6d5ae;
+          margin-bottom: 8px;
+        "
+      >
+        <div v-for="(line, i) in kickerLines.slice(1)" :key="i">{{ line }}</div>
+      </div>
+      <h1
+        class="hero-title"
+        style="
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-weight: 700;
+          font-size: 56px;
+          line-height: 1.5;
+          margin: 0 0 20px;
+          letter-spacing: 0.1em;
+        "
+      >
+        {{ copy('home_hero_title') }}
+      </h1>
+      <div
+        class="hero-verse"
+        style="
+          font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
+          font-size: 20px;
+          line-height: 2.25;
+          letter-spacing: 0.14em;
+          color: #d9c8a6;
+          max-width: 580px;
+          margin: 0 auto 40px;
+        "
+      >
+        <div v-for="(line, i) in verseLines" :key="i">{{ line }}</div>
+      </div>
+      <div class="hero-btns" style="display: flex; gap: 16px; justify-content: center">
+        <button class="btn-gold" @click="navigateTo('/course')">立即報名課程</button>
+        <button
+          class="btn-outline"
+          style="color: #c9a24b; border-color: #c9a24b"
+          @click="navigateTo('/about')"
+        >
+          認識道場
+        </button>
+      </div>
+    </div>
+
+    <!-- 跑馬燈:與最新公告頁共用同一元件,內容一致 -->
+    <NewsMarquee :announcements="ann ?? []" />
+
+    <!-- 最新公告 -->
+    <div class="sec">
+      <div class="sec-head">
+        <div>
+          <div class="sec-en">LATEST NEWS</div>
+          <div class="sec-title">最新公告</div>
+        </div>
+        <NuxtLink class="more-link" to="/news">查看全部 →</NuxtLink>
+      </div>
+      <div>
+        <div v-if="annPending" class="loading">讀取中…</div>
+        <template v-else-if="homeNews.length">
+          <div
+            v-for="n in homeNews"
+            :key="n.id"
+            class="news-item fadein"
+            @click="navigateTo('/news')"
+          >
+            <span class="news-date">{{ n.date || '—' }}</span>
+            <span class="news-tag">{{ n.tag }}</span>
+            <span class="news-title">{{ n.title }}</span>
+          </div>
+        </template>
+        <div v-else class="empty-msg">目前尚無公告。</div>
+      </div>
+    </div>
+
+    <!-- 法寶略節 -->
+    <div class="sec-bg">
+      <div class="sec-bg-inner">
+        <div class="center" style="margin-bottom: 46px">
+          <div class="sec-en">DHARMA PRIMER</div>
+          <div class="sec-title">法寶略節</div>
+          <p style="font-size: 15px; color: #8a6f55; margin: 8px 0 0">循序漸進，建立正知正見</p>
+        </div>
+        <div class="grid2">
+          <NuxtLink class="dharma-card" to="/sutra">
+            <div class="dharma-num">壹</div>
+            <div class="dharma-name">{{ copy('home_primer_card1_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card1_desc') }}</p>
+            <div class="dharma-more">閱讀經文 →</div>
+          </NuxtLink>
+          <NuxtLink class="dharma-card" to="/primer">
+            <div class="dharma-num">貳</div>
+            <div class="dharma-name">{{ copy('home_primer_card2_title') }}</div>
+            <p class="dharma-desc">{{ copy('home_primer_card2_desc') }}</p>
+            <div class="dharma-more">前往下載 →</div>
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+
+    <!-- 法師說法 -->
+    <div class="sec">
+      <div class="sec-head">
+        <div>
+          <div class="sec-en">VIDEO TEACHING</div>
+          <div class="sec-title">法師說法</div>
+        </div>
+        <NuxtLink class="more-link" to="/video">更多影片 →</NuxtLink>
+      </div>
+      <div class="grid2">
+        <div v-if="vidPending" class="loading" style="grid-column: 1/-1">讀取中…</div>
+        <template v-else-if="homeVideos.length">
+          <a
+            v-for="v in homeVideos"
+            :key="v.id"
+            class="video-thumb fadein"
+            :href="v.youtube_url || '#'"
+            target="_blank"
+            rel="noopener"
+          >
+            <div class="video-play">▶</div>
+            <div class="video-label">{{ v.title }}</div>
+          </a>
+        </template>
+        <div v-else class="empty-msg" style="grid-column: 1/-1">目前尚無影片。</div>
+      </div>
+    </div>
+  </div>
+</template>
