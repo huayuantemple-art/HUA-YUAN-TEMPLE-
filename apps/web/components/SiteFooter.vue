@@ -24,6 +24,7 @@ const { data: contact } = useLazyAsyncData('contact', () => api.contact.get())
           <NuxtLink to="/video">法師說法</NuxtLink>
           <NuxtLink to="/course">課程報名</NuxtLink>
           <NuxtLink to="/about">關於我們</NuxtLink>
+          <NuxtLink to="/value">人生的價值</NuxtLink>
         </div>
       </div>
       <div>
