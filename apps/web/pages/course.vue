@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '課程報名 · 華圓覺苑',
+  description:
+    '華圓覺苑佛學課程資訊與線上報名，以現代語言帶你研讀《心經》《金剛經》等經典。',
+  ogTitle: '課程報名 · 華圓覺苑',
+  ogDescription:
+    '華圓覺苑佛學課程資訊與線上報名，以現代語言帶你研讀《心經》《金剛經》等經典。',
+})
+
 const api = useApi()
 const { copy } = useSiteCopy()
 const { data: courses, pending } = useLazyAsyncData('courses', () => api.courses.listPublic())

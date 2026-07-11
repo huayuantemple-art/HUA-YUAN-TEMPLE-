@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '關於我們 · 華圓覺苑',
+  description:
+    '認識華圓覺苑的宗旨與願景：以慈悲利他、般若智慧與清淨心，將佛法的溫度帶入現代生活。',
+  ogTitle: '關於我們 · 華圓覺苑',
+  ogDescription:
+    '認識華圓覺苑的宗旨與願景：以慈悲利他、般若智慧與清淨心，將佛法的溫度帶入現代生活。',
+})
+
 import { escapeHtml } from '@huayuan/shared'
 
 const api = useApi()

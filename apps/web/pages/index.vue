@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '華圓覺苑 · HUA YUAN TEMPLE',
+  description:
+    '華圓覺苑是弘揚漢傳佛教的道場，提供佛學課程、法師說法、經典講義與最新法會公告，以現代語言引導大眾親近佛法。',
+  ogTitle: '華圓覺苑 · HUA YUAN TEMPLE',
+  ogDescription:
+    '華圓覺苑是弘揚漢傳佛教的道場，提供佛學課程、法師說法、經典講義與最新法會公告，以現代語言引導大眾親近佛法。',
+})
+
 const api = useApi()
 const { copy } = useSiteCopy()
 

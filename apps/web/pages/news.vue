@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '最新公告 · 華圓覺苑',
+  description:
+    '華圓覺苑最新法會、課程與活動公告，掌握道場近期消息與報名資訊。',
+  ogTitle: '最新公告 · 華圓覺苑',
+  ogDescription:
+    '華圓覺苑最新法會、課程與活動公告，掌握道場近期消息與報名資訊。',
+})
+
 const api = useApi()
 const { data: ann, pending } = useLazyAsyncData('announcements', () =>
   api.announcements.listPublished(),

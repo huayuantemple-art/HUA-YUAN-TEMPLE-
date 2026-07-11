@@ -1,0 +1,5 @@
+# 允許所有搜尋引擎爬取全站
+User-agent: *
+Allow: /
+
+Sitemap: https://huayuan-web.vercel.app/sitemap.xml

@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '法師說法 · 華圓覺苑',
+  description:
+    '觀看華圓覺苑法師開示影片，深入淺出解說佛法義理與經典要義。',
+  ogTitle: '法師說法 · 華圓覺苑',
+  ogDescription:
+    '觀看華圓覺苑法師開示影片，深入淺出解說佛法義理與經典要義。',
+})
+
 const api = useApi()
 const { data: videos, pending } = useLazyAsyncData('videos', () => api.videos.listPublished())
 const list = computed(() => videos.value ?? [])

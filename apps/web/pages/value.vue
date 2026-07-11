@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '人生的價值 · 華圓覺苑',
+  description:
+    '從佛法的角度探索人生的價值與意義，陪你面對現代生活的迷惘、焦慮與生命課題。',
+  ogTitle: '人生的價值 · 華圓覺苑',
+  ogDescription:
+    '從佛法的角度探索人生的價值與意義，陪你面對現代生活的迷惘、焦慮與生命課題。',
+})
+
 // 人生的價值頁:內容來自後台「網站文案」;此頁需 shared 的 life_value_* 文案 key。
 const { copy } = useSiteCopy()
 

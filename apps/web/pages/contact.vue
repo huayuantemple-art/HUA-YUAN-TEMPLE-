@@ -1,4 +1,13 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '聯絡與交通 · 華圓覺苑',
+  description:
+    '華圓覺苑地址、交通方式與聯絡電話，歡迎來電洽詢或親臨道場共修。',
+  ogTitle: '聯絡與交通 · 華圓覺苑',
+  ogDescription:
+    '華圓覺苑地址、交通方式與聯絡電話，歡迎來電洽詢或親臨道場共修。',
+})
+
 import { resolveMapEmbedSrc } from '@huayuan/shared'
 import type { Contact } from '@huayuan/shared'
 import defaultContactIconUrl from '~/assets/img/huayuan-logo.png'
