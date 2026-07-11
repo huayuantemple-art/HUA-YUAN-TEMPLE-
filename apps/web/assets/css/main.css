@@ -2061,3 +2061,10 @@ textarea.contact-input {
   color: #5a4636;
   font-family: 'Noto Serif TC', serif;
 }
+
+/* 手機電話號碼不再顯示藍色 */
+a[href='tel:'] {
+  color: inherit;
+  text-decoration: none;
+  -webkit-text-fill-color: currentColor;
+}
