@@ -146,6 +146,7 @@ function exportCSV() {
       :data="data.registrations"
       :loading="loading"
       :reset-key="courseFilter"
+      :scroll-x="960"
       item-label="報名"
       count-unit="筆"
       empty-text="尚無報名資料"

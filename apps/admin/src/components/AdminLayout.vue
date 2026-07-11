@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { SITE_URL } from '../lib/site'
 import { useAuthStore } from '../stores/auth'
@@ -30,6 +30,20 @@ const NAV_SETTINGS = [
 
 const pageTitle = computed(() => (route.meta.title as string) ?? '')
 
+// 手機版側欄抽屜:桌機無作用(漢堡按鈕以 CSS 隱藏)
+const navOpen = ref(false)
+function go(name: string) {
+  navOpen.value = false
+  void router.push({ name })
+}
+// 換頁時自動收起(含瀏覽器上一頁)
+watch(
+  () => route.name,
+  () => {
+    navOpen.value = false
+  },
+)
+
 // 同舊站 setDate():YYYY.MM.DD 週X
 const p2 = (n: number) => String(n).padStart(2, '0')
 const d = new Date()
@@ -56,7 +70,8 @@ async function doLogout() {
 
 <template>
   <div class="layout">
-    <aside class="sidebar">
+    <div class="nav-backdrop" :class="{ show: navOpen }" @click="navOpen = false"></div>
+    <aside class="sidebar" :class="{ 'nav-open': navOpen }">
       <div class="s-head">
         <img class="s-logo" :src="logoUrl" alt="華圓覺苑 logo" />
         <div>
@@ -71,7 +86,7 @@ async function doLogout() {
           :key="item.name"
           class="nav-item"
           :class="{ active: route.name === item.name }"
-          @click="router.push({ name: item.name })"
+          @click="go(item.name)"
         >
           <span class="nav-icon">{{ item.icon }}</span>
           {{ item.label }}
@@ -82,7 +97,7 @@ async function doLogout() {
           :key="item.name"
           class="nav-item"
           :class="{ active: route.name === item.name }"
-          @click="router.push({ name: item.name })"
+          @click="go(item.name)"
         >
           <span class="nav-icon">{{ item.icon }}</span>
           {{ item.label }}
@@ -93,7 +108,7 @@ async function doLogout() {
           <div
             class="nav-item"
             :class="{ active: route.name === 'accounts' }"
-            @click="router.push({ name: 'accounts' })"
+            @click="go('accounts')"
           >
             <span class="nav-icon">⚙</span>
             帳號管理
@@ -112,7 +127,10 @@ async function doLogout() {
 
     <div class="main">
       <header class="topbar">
-        <div class="page-title">{{ pageTitle }}</div>
+        <div class="topbar-l">
+          <button class="nav-toggle" aria-label="開啟選單" @click="navOpen = true">☰</button>
+          <div class="page-title">{{ pageTitle }}</div>
+        </div>
         <div class="topbar-r">
           <a :href="SITE_URL" target="_blank" class="preview-btn">↗ 預覽前台</a>
           <div class="text-muted" style="font-size: 13px">{{ today }}</div>

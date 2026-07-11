@@ -286,6 +286,28 @@ body {
   padding: 28px 34px 60px;
   flex: 1;
 }
+.topbar-l {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+/* 漢堡按鈕:桌機隱藏,手機顯示(見底部 @media) */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--brown);
+  cursor: pointer;
+  padding: 4px 6px;
+  margin-left: -4px;
+}
+/* 手機側欄遮罩:桌機不存在 */
+.nav-backdrop {
+  display: none;
+}
 
 /* COMMON */
 .card {
@@ -694,4 +716,111 @@ textarea.inp {
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.12);
   border-radius: 3px;
+}
+
+/* ══════════ 手機版(≤768px)══════════
+   桌機外觀完全不受影響:以下規則只在窄螢幕生效。 */
+@media (max-width: 768px) {
+  /* 側欄改為由左滑出的抽屜 */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 82vw;
+    max-width: 300px;
+    z-index: 120;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 6px 0 30px rgba(0, 0, 0, 0.28);
+  }
+  .sidebar.nav-open {
+    transform: none;
+  }
+
+  /* 遮罩:抽屜開啟時淡入,點擊關閉 */
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 12, 10, 0.42);
+    z-index: 110;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .nav-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* topbar 精簡 + 顯示漢堡 */
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .topbar {
+    height: 56px;
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .page-title {
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-r {
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .preview-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  /* 日期在窄螢幕省略,讓出空間 */
+  .topbar-r .text-muted {
+    display: none;
+  }
+
+  /* 內容內距縮小;底部留白給固定分頁列 */
+  .content {
+    padding: 18px 14px 88px;
+  }
+
+  /* 總覽統計卡:5 欄 → 2 欄 */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .stat {
+    padding: 16px 16px;
+  }
+  .stat-val {
+    font-size: 28px;
+  }
+
+  /* 表單雙/三欄 → 單欄 */
+  .g2,
+  .g3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* 標題列可換行,避免按鈕擠出畫面 */
+  .row-between {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* 卡片內距縮小 */
+  .card-pad {
+    padding: 18px 16px;
+  }
+
+  /* 編輯抽屜滿版 */
+  .drawer {
+    width: 100vw;
+    max-width: 100vw;
+  }
 }

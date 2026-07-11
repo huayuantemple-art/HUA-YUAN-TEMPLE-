@@ -19,6 +19,7 @@ const props = withDefaults(
     resetKey?: string | number
     rowKey?: DataTableCreateRowKey<Row>
     pageSizes?: number[]
+    scrollX?: number
   }>(),
   {
     loading: false,
@@ -27,6 +28,7 @@ const props = withDefaults(
     resetKey: '',
     rowKey: undefined,
     pageSizes: () => [10, 20, 50],
+    scrollX: 800,
   },
 )
 
@@ -66,6 +68,7 @@ watch([() => props.data.length, pageSize], () => {
         :row-key="rowKey"
         :bordered="false"
         :single-line="false"
+        :scroll-x="scrollX"
       >
         <template #empty>
           <slot name="empty">{{ emptyText }}</slot>
@@ -74,7 +77,7 @@ watch([() => props.data.length, pageSize], () => {
     </div>
 
     <div
-      class="fixed right-0 bottom-4 left-[248px] z-30 flex justify-center  bg-[rgba(242,239,234,0.96)] px-[34px] py-4 backdrop-blur"
+      class="fixed right-0 bottom-4 left-0 z-30 flex justify-center  bg-[rgba(242,239,234,0.96)] px-3 py-4 backdrop-blur md:left-[248px] md:px-[34px]"
     >
       <NPagination
         v-model:page="page"
