@@ -36,14 +36,17 @@ export function parseAnnouncementDate(value: string | null | undefined): Announc
 export function sortAnnouncementsByDate<T extends { date: string | null; created_at?: string }>(
   list: T[],
 ): T[] {
-  const key = (v: string | null | undefined): number => {
+  const key = (v: string | null | undefined): number | null => {
     const p = parseAnnouncementDate(v)
-    return p ? p.year * 10000 + p.month * 100 + p.day : -1
+    return p ? p.year * 10000 + p.month * 100 + p.day : null
   }
   return [...list].sort((a, b) => {
     const ka = key(a.date)
     const kb = key(b.date)
-    if (ka !== kb) return kb - ka
-    return (b.created_at ?? '').localeCompare(a.created_at ?? '')
+    if (ka === null && kb === null) return (a.created_at ?? '').localeCompare(b.created_at ?? '')
+    if (ka === null) return 1
+    if (kb === null) return -1
+    if (ka !== kb) return ka - kb
+    return (a.created_at ?? '').localeCompare(b.created_at ?? '')
   })
 }
