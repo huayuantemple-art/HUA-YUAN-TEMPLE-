@@ -27,3 +27,23 @@ export function parseAnnouncementDate(value: string | null | undefined): Announc
   }
   return { year, month, day }
 }
+
+/**
+ * 依公告日期排序(新→舊)。date 為自由文字,故用 parseAnnouncementDate 解析;
+ * 可解析者依日期排前面,無法解析(null/格式不符)者墊到最後、彼此再依 created_at 新→舊。
+ * 前台最新公告用此排序,避免因建立順序不同而日期亂跳。
+ */
+export function sortAnnouncementsByDate<T extends { date: string | null; created_at?: string }>(
+  list: T[],
+): T[] {
+  const key = (v: string | null | undefined): number => {
+    const p = parseAnnouncementDate(v)
+    return p ? p.year * 10000 + p.month * 100 + p.day : -1
+  }
+  return [...list].sort((a, b) => {
+    const ka = key(a.date)
+    const kb = key(b.date)
+    if (ka !== kb) return kb - ka
+    return (b.created_at ?? '').localeCompare(a.created_at ?? '')
+  })
+}

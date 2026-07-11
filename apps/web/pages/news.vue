@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { sortAnnouncementsByDate } from '@huayuan/shared'
+
 useSeoMeta({
   title: '最新公告 · 華圓覺苑',
   description:
@@ -9,8 +11,10 @@ useSeoMeta({
 })
 
 const api = useApi()
-const { data: ann, pending } = useLazyAsyncData('announcements', () =>
-  api.announcements.listPublished(),
+const { data: ann, pending } = useLazyAsyncData(
+  'announcements',
+  () => api.announcements.listPublished(),
+  { transform: sortAnnouncementsByDate },
 )
 
 const filters = ['全部', '課程', '法會', '公告']

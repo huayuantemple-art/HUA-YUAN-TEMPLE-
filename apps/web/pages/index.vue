@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { sortAnnouncementsByDate } from '@huayuan/shared'
+
 useSeoMeta({
   title: '華圓覺苑 · HUA YUAN TEMPLE',
   description:
@@ -24,8 +26,10 @@ const verseLines = computed(() =>
     .map((line) => line.trim())
     .filter(Boolean),
 )
-const { data: ann, pending: annPending } = useLazyAsyncData('announcements', () =>
-  api.announcements.listPublished(),
+const { data: ann, pending: annPending } = useLazyAsyncData(
+  'announcements',
+  () => api.announcements.listPublished(),
+  { transform: sortAnnouncementsByDate },
 )
 const { data: videos, pending: vidPending } = useLazyAsyncData('videos', () =>
   api.videos.listPublished(),
