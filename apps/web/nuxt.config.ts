@@ -14,6 +14,11 @@ export default defineNuxtConfig({
 
   // 由環境變數 NUXT_PUBLIC_SUPABASE_URL / NUXT_PUBLIC_SUPABASE_ANON_KEY 注入
   runtimeConfig: {
+    // 通知信設定(伺服器端私密;由 Vercel 環境變數注入):
+    // NUXT_RESEND_API_KEY / NUXT_NOTIFY_EMAIL / NUXT_NOTIFY_SECRET
+    resendApiKey: '',
+    notifyEmail: '',
+    notifySecret: '',
     public: {
       supabaseUrl: '',
       supabaseAnonKey: '',
