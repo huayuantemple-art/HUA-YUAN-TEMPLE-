@@ -52,6 +52,10 @@ const lineUrl = computed(() => copy('life_value_line_url').trim())
       <p>{{ copy('life_value_banner_verse') }}</p>
     </div>
     <section class="value-page">
+      <figure class="value-figure">
+        <img src="/images/dizang-bodhisattva.jpg" alt="地藏菩薩聖像" />
+        <figcaption>地藏菩薩聖像</figcaption>
+      </figure>
       <div v-if="introLines.length" class="value-intro">
         <p v-for="(line, i) in introLines" :key="i">{{ line }}</p>
       </div>

@@ -1882,6 +1882,23 @@ iframe {
   margin: 0 auto;
   padding: 56px 40px 88px;
 }
+.value-figure {
+  margin: 0 0 44px;
+}
+.value-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid rgba(201, 162, 75, 0.35);
+}
+.value-figure figcaption {
+  text-align: center;
+  font-family: 'Noto Serif TC', serif;
+  font-size: 14px;
+  color: #8a6f55;
+  letter-spacing: 0.2em;
+  margin-top: 12px;
+}
 .value-intro {
   text-align: center;
   font-family: 'LXGW WenKai TC', 'Noto Serif TC', serif;
