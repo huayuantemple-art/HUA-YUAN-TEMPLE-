@@ -24,11 +24,15 @@
 
 ### Requirement: 表單驗證
 
-表單 SHALL 驗證:姓名、電話、Email、年齡為必填;Email MUST 符合 email 格式;年齡 MUST 為 1~3 位數字。驗證失敗 MUST 以與現有一致的錯誤樣式與訊息提示,且不送出。
+表單 SHALL 驗證:姓名、電話、年齡為必填;年齡 MUST 為 1~3 位數字。Email 為選填,留空即通過;若有填則 MUST 符合 email 格式,未填以 null 寫入。驗證失敗 MUST 以與現有一致的錯誤樣式與訊息提示,且不送出。
 
 #### Scenario: 缺少必填欄位
-- **WHEN** 使用者未填姓名、電話、Email 或年齡即送出
+- **WHEN** 使用者未填姓名、電話或年齡即送出
 - **THEN** 對應欄位顯示錯誤且不送出
+
+#### Scenario: Email 選填未填仍可送出
+- **WHEN** 使用者未填 Email 但填妥其他必填欄位即送出
+- **THEN** 報名成功,Email 以 null 寫入
 
 #### Scenario: Email 格式錯誤
 - **WHEN** 使用者填入格式錯誤的 Email

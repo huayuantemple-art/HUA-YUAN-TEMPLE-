@@ -119,8 +119,9 @@ async function submitForm() {
   // 驗證(比照紙本必填:姓名/電話/Email/年齡)+ 隱私權同意
   errors.name = !form.name.trim()
   errors.phone = !form.phone.trim()
+  // Email 改為選填:留空即通過;有填才驗證格式
   const email = form.email.trim()
-  errors.email = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  errors.email = !!email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   errors.age = !/^\d{1,3}$/.test(form.age.trim())
   errors.privacy = !agreePrivacy.value
   if (errors.name || errors.phone || errors.email || errors.age || errors.privacy) return
@@ -143,7 +144,7 @@ async function submitForm() {
       course_name: selectedCourse.value.name,
       name: form.name.trim(),
       phone: form.phone.trim(),
-      email,
+      email: email || null,
       age: form.age.trim(),
       gender: form.gender || null,
       venue: form.venue || null,
@@ -272,7 +273,7 @@ async function submitForm() {
           </div>
 
           <div class="field">
-            <label class="lbl required">電子信箱</label>
+            <label class="lbl">電子信箱 <span class="lbl-note">（選填）</span></label>
             <input
               v-model="form.email"
               class="inp"
