@@ -1,0 +1,147 @@
+<script setup lang="ts">
+import type { DocumentCategory, DocumentRow } from '@huayuan/shared'
+
+// 法寶略節與法師說法共用同一套文檔機制,以 category 分頁顯示。
+// 線上閱讀(sutras)經 document_id 連動,依「所連文檔的分類」過濾。
+const props = defineProps<{ category: DocumentCategory }>()
+
+const api = useApi()
+const { copy } = useSiteCopy()
+
+const { data: docs, pending: docsPending } = useLazyAsyncData('documents', () =>
+  api.documents.listPublished(),
+)
+const { data: sutras, pending: sutrasPending } = useLazyAsyncData('sutras', () =>
+  api.sutras.listPublished(),
+)
+
+// 未套用 migration 前 category 可能為 undefined,一律視為「法寶略節」(不改變現行行為)
+const categoryOf = (d: DocumentRow): DocumentCategory => d.category ?? '法寶略節'
+const documentList = computed(() =>
+  (docs.value ?? []).filter((d) => categoryOf(d) === props.category),
+)
+const readingList = computed(() =>
+  (sutras.value ?? []).filter((sutra) => {
+    if (sutra.document_id === null) return false
+    const doc = (docs.value ?? []).find((d) => d.id === sutra.document_id)
+    return doc ? categoryOf(doc) === props.category : props.category === '法寶略節'
+  }),
+)
+
+function documentExtension(filename: string): string {
+  return filename.split('.').pop()?.toUpperCase() || '檔案'
+}
+
+function documentDownloadName(name: string, filename: string): string {
+  const extension = filename.split('.').pop()?.toLowerCase()
+  return extension ? `${name}.${extension}` : name
+}
+
+function documentDownloadUrl(name: string, filename: string): string {
+  const params = new URLSearchParams({
+    path: filename,
+    name: documentDownloadName(name, filename),
+  })
+  return `/api/download?${params.toString()}`
+}
+</script>
+
+<template>
+  <div>
+    <div
+      style="
+        font-family: 'Noto Serif TC', serif;
+        font-size: 24px;
+        color: #3a211c;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+      "
+    >
+      線上閱讀
+    </div>
+    <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
+    <div v-if="sutrasPending" class="loading">讀取中…</div>
+    <div
+      v-else-if="readingList.length"
+      class="primer-reading-grid"
+      style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px"
+    >
+      <NuxtLink
+        v-for="sutra in readingList"
+        :key="sutra.id"
+        class="dharma-card"
+        :to="`/sutra/${sutra.id}`"
+        style="text-align: left; display: block"
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+          "
+        >
+          <div
+            style="
+              width: 46px;
+              height: 46px;
+              border: 1px solid #c9a24b;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: 'Noto Serif TC', serif;
+              color: #c9a24b;
+              font-size: 18px;
+            "
+          >
+            經
+          </div>
+          <span
+            style="
+              font-size: 11px;
+              padding: 3px 10px;
+              background: rgba(110, 140, 80, 0.15);
+              color: #5f7a3e;
+            "
+            >{{ copy('primer_reading_badge') }}</span
+          >
+        </div>
+        <div class="dharma-name">{{ sutra.title }}</div>
+        <p class="dharma-desc">{{ sutra.translator || copy('primer_reading_fallback_desc') }}</p>
+        <div class="dharma-more" style="margin-top: 14px">閱讀經文 →</div>
+      </NuxtLink>
+    </div>
+    <div v-else class="empty-msg">目前尚無經文，敬請期待。</div>
+
+    <div
+      style="
+        margin-top: 52px;
+        font-family: 'Noto Serif TC', serif;
+        font-size: 24px;
+        color: #3a211c;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+      "
+    >
+      佛法文檔下載
+    </div>
+    <div style="width: 48px; height: 2px; background: #c9a24b; margin-bottom: 34px"></div>
+    <div>
+      <div v-if="docsPending" class="loading">讀取中…</div>
+      <template v-else-if="documentList.length">
+        <div v-for="d in documentList" :key="d.id" class="doc-item fadein">
+          <div class="doc-icon">▤</div>
+          <div class="doc-info">
+            <div class="doc-name">{{ d.name }}</div>
+            <div class="doc-desc">{{ d.description || '' }}</div>
+          </div>
+          <a class="doc-dl" :href="documentDownloadUrl(d.name, d.filename)"
+            >下載 {{ documentExtension(d.filename) }} ↓</a
+          >
+        </div>
+      </template>
+      <div v-else class="empty-msg">目前尚無文檔，敬請期待。</div>
+    </div>
+  </div>
+</template>

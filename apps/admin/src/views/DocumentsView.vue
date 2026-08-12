@@ -5,10 +5,13 @@ import {
   PDF_BUCKET,
   storagePublicUrl,
   storageSafeObjectPath,
+  type DocumentCategory,
   type DocumentRow,
   type DocumentStatus,
   type Sutra,
 } from '@huayuan/shared'
+
+const DOCUMENT_CATEGORIES: DocumentCategory[] = ['法寶略節', '法師說法']
 import AdminDataTable from '../components/AdminDataTable.vue'
 import AppDrawer from '../components/AppDrawer.vue'
 import { useDrawer } from '../composables/useDrawer'
@@ -37,6 +40,7 @@ const form = reactive({
   name: '',
   description: '',
   filename: '',
+  category: '法寶略節' as DocumentCategory,
   status: '草稿' as DocumentStatus,
 })
 
@@ -130,7 +134,14 @@ async function uploadDocumentFile(event: Event) {
 
 function openNew() {
   drawerTitle.value = '新增佛法文檔'
-  Object.assign(form, { id: null, name: '', description: '', filename: '', status: '草稿' })
+  Object.assign(form, {
+    id: null,
+    name: '',
+    description: '',
+    filename: '',
+    category: '法寶略節',
+    status: '草稿',
+  })
   resetPendingFile()
   openDrawer()
 }
@@ -142,6 +153,7 @@ function openEdit(d: DocumentRow) {
     name: d.name,
     description: d.description ?? '',
     filename: d.filename,
+    category: d.category ?? '法寶略節',
     status: d.status,
   })
   resetPendingFile()
@@ -153,6 +165,7 @@ async function save() {
     name: form.name.trim() || '（未命名文檔）',
     description: form.description.trim(),
     filename: form.filename.trim(),
+    category: form.category,
     status: form.status,
   }
   if (!p.filename) {
@@ -266,6 +279,13 @@ const columns: DataTableColumns<DocumentRow> = [
     render: (row) => h('span', { class: 'text-[13px] text-muted' }, row.description || '—'),
   },
   {
+    title: '分類',
+    key: 'category',
+    width: 96,
+    render: (row) =>
+      h('span', { class: 'text-[13px] text-[#6b5a48]' }, row.category ?? '法寶略節'),
+  },
+  {
     title: '檔名（pdfs/…）',
     key: 'filename',
     width: 160,
@@ -344,6 +364,15 @@ onMounted(() => {
           rows="3"
           placeholder="簡短描述這份文檔的內容…"
         ></textarea>
+      </div>
+      <div class="fr">
+        <label class="lbl">顯示分類</label>
+        <select v-model="form.category" class="inp">
+          <option v-for="c in DOCUMENT_CATEGORIES" :key="c" :value="c">{{ c }}</option>
+        </select>
+        <div class="text-muted" style="font-size: 12px; margin-top: 6px">
+          決定這份文檔顯示在「法寶略節」還是「法師說法」頁；線上閱讀也隨分類顯示於對應頁。
+        </div>
       </div>
       <div class="fr">
         <label class="lbl" for="document-filename">檔名</label>

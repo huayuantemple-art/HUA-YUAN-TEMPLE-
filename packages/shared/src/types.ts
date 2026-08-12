@@ -45,12 +45,17 @@ export interface Video {
 
 export type DocumentStatus = '草稿' | '已發布'
 
+/** 文檔分類:決定顯示於「法寶略節」或「法師說法」頁 */
+export type DocumentCategory = '法寶略節' | '法師說法'
+
 export interface DocumentRow {
   id: number
   name: string
   description: string | null
   filename: string
   status: DocumentStatus
+  /** 分類(law-primer / dharma-talk 兩頁共用文檔機制);舊資料/未套用 migration 前可能為 undefined,前台以「法寶略節」為預設 */
+  category?: DocumentCategory
   created_at: string
 }
 

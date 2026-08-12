@@ -37,6 +37,11 @@ const list = computed(() => videos.value ?? [])
         </template>
         <div v-else class="empty-msg" style="grid-column: 1/-1">目前尚無影片，敬請期待。</div>
       </div>
+
+      <!-- 法師說法文檔:與法寶略節共用機制,後台上傳並選分類「法師說法」 -->
+      <div style="max-width: 1080px; margin: 56px auto 0">
+        <DharmaDocuments category="法師說法" />
+      </div>
     </div>
   </div>
 </template>
