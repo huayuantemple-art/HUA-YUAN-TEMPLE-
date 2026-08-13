@@ -3,7 +3,15 @@ import type { DocumentCategory, DocumentRow } from '@huayuan/shared'
 
 // 法寶略節與法師說法共用同一套文檔機制,以 category 分頁顯示。
 // 線上閱讀(sutras)經 document_id 連動,依「所連文檔的分類」過濾。
-const props = defineProps<{ category: DocumentCategory }>()
+// readMoreLabel / showReadingDesc:法師說法頁客製(「閱讀」、不顯示「法寶略節經文」預設說明)。
+const props = withDefaults(
+  defineProps<{
+    category: DocumentCategory
+    readMoreLabel?: string
+    showReadingDesc?: boolean
+  }>(),
+  { readMoreLabel: '閱讀經文', showReadingDesc: true },
+)
 
 const api = useApi()
 const { copy } = useSiteCopy()
@@ -108,8 +116,10 @@ function documentDownloadUrl(name: string, filename: string): string {
           >
         </div>
         <div class="dharma-name">{{ sutra.title }}</div>
-        <p class="dharma-desc">{{ sutra.translator || copy('primer_reading_fallback_desc') }}</p>
-        <div class="dharma-more" style="margin-top: 14px">閱讀經文 →</div>
+        <p v-if="showReadingDesc" class="dharma-desc">
+          {{ sutra.translator || copy('primer_reading_fallback_desc') }}
+        </p>
+        <div class="dharma-more" style="margin-top: 14px">{{ readMoreLabel }} →</div>
       </NuxtLink>
     </div>
     <div v-else class="empty-msg">目前尚無經文，敬請期待。</div>

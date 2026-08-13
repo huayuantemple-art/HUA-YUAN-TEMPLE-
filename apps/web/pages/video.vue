@@ -40,7 +40,7 @@ const list = computed(() => videos.value ?? [])
 
       <!-- 法師說法文檔:與法寶略節共用機制,後台上傳並選分類「法師說法」 -->
       <div style="max-width: 1080px; margin: 56px auto 0">
-        <DharmaDocuments category="法師說法" />
+        <DharmaDocuments category="法師說法" read-more-label="閱讀" :show-reading-desc="false" />
       </div>
     </div>
   </div>
