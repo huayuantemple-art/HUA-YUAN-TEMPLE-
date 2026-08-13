@@ -9,8 +9,9 @@ const props = withDefaults(
     category: DocumentCategory
     readMoreLabel?: string
     showReadingDesc?: boolean
+    showReadingIcon?: boolean
   }>(),
-  { readMoreLabel: '閱讀經文', showReadingDesc: true },
+  { readMoreLabel: '閱讀經文', showReadingDesc: true, showReadingIcon: true },
 )
 
 const api = useApi()
@@ -82,14 +83,15 @@ function documentDownloadUrl(name: string, filename: string): string {
         style="text-align: left; display: block"
       >
         <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-          "
+          :style="{
+            display: 'flex',
+            justifyContent: showReadingIcon ? 'space-between' : 'flex-end',
+            alignItems: 'center',
+            marginBottom: '16px',
+          }"
         >
           <div
+            v-if="showReadingIcon"
             style="
               width: 46px;
               height: 46px;
